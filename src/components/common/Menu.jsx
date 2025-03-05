@@ -1,39 +1,52 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Menu = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const menuRef = useRef(null);
+
+  const mainMenuItems = [
+    { label: '배출대행', path: '/request-form' },
+    { label: '클린하우스란?', path: '/guide' },
+  ];
+
+  const otherMenuItems = [
+    { label: '지도', path: '/' },
+    { label: '클린하우스란?', path: '/guide' },
+  ];
+
+  const menuItems = location.pathname === '/' ? mainMenuItems : otherMenuItems;
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        onClose();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [onClose]);
 
   if (!isOpen) return null;
 
-  const menuItems = [
-    { label: '지도', path: '/' },
-    { label: '가이드', path: '/guide' },
-    { label: '배출 요청하기', path: '/request-form' },
-    { label: '요청 목록', path: '/request-list' },
-    { label: '마이페이지', path: '/mypage' },
-    { label: '로그아웃', path: '/logout' },
-  ];
+  const handleMenuClick = (path) => {
+    navigate(path);
+    onClose();
+  };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50">
-      <div className="absolute right-0 top-0 bottom-0 w-64 bg-white shadow-lg">
-        <div className="flex justify-between items-center p-4 border-b">
-          <h2 className="font-bold text-lg">메뉴</h2>
-          <button onClick={onClose} className="text-2xl">
-            &times;
-          </button>
-        </div>
-
-        <ul>
+    <div ref={menuRef} className="absolute top-0 right-0 mt-14 mr-4 z-50">
+      <div className="bg-white rounded-lg w-48 shadow-lg overflow-hidden">
+        <ul className="py-1">
           {menuItems.map((item) => (
             <li key={item.path}>
               <button
-                className="block w-full text-left px-4 py-3 hover:bg-gray-100"
-                onClick={() => {
-                  navigate(item.path);
-                  onClose();
-                }}
+                className="block w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-100 text-sm"
+                onClick={() => handleMenuClick(item.path)}
               >
                 {item.label}
               </button>

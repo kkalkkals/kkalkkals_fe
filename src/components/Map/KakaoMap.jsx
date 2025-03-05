@@ -68,6 +68,7 @@ const KakaoMap = () => {
         center={center}
         level={level}
         style={{ width: '100%', height: '100%' }}
+        onZoomChanged={(map) => setLevel(map.getLevel())}
       >
         {/* 시설 마커 */}
         {facilityData.map((facility) => (

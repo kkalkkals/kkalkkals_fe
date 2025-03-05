@@ -1,17 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import KakaoMap from '../components/Map/KakaoMap';
-import SearchBar from '../components/Map/SearchBar';
-import TabMenu from '../components/tabs/TabMenu';
 
 const MainPage = () => {
   const navigate = useNavigate();
   const [searchKeyword, setSearchKeyword] = useState('');
-
-  const handleSearch = (keyword) => {
-    setSearchKeyword(keyword);
-    // 지도 검색 로직 구현
-  };
 
   return (
     <div className="h-screen flex flex-col">
@@ -25,7 +18,7 @@ const MainPage = () => {
           <input
             type="text"
             placeholder="찾으시는 주소 입력해주세요"
-            className="flex-1 px-2 py-1 outline-none"
+            className="flex-1 px-2 py-1 outline-none text-sm"
             value={searchKeyword}
             onChange={(e) => setSearchKeyword(e.target.value)}
           />
@@ -63,15 +56,6 @@ const MainPage = () => {
       <div className="flex-1 relative">
         <KakaoMap />
       </div>
-
-      <TabMenu
-        activeTab="map"
-        onChangeTab={(tab) => {
-          if (tab === 'request') {
-            navigate('/request');
-          }
-        }}
-      />
     </div>
   );
 };
