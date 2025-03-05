@@ -8,7 +8,7 @@ import TabMenu from '../components/tabs/TabMenu';
 const dummyRequests = [
   {
     id: 1,
-    date: '2025-03-06',
+    date: '2025-03-05',
     status: '요청중',
     trashType: '일반쓰레기, 유리류',
     trashAmount: '20L',
@@ -18,7 +18,7 @@ const dummyRequests = [
   },
   {
     id: 2,
-    date: '2025-03-06',
+    date: '2025-03-02',
     status: '요청중',
     trashType: '일반쓰레기, 유리류',
     trashAmount: '20L',

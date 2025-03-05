@@ -1,11 +1,3 @@
-// import './App.css';
-
-// function App() {
-//   return <div className="font-bold">깔깔쓰</div>;
-// }
-
-// export default App;
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import MainPage from './pages/MainPage';
@@ -19,7 +11,7 @@ import Menu from './components/common/Menu';
 const App = () => {
   return (
     <Router>
-      <div className="max-w-md mx-auto min-h-screen bg-gray-50">
+      <div className="max-w-md mx-auto min-h-screen bg-gray-50 overflow-x-hidden">
         <Routes>
           <Route path="/" element={<MainPage />} />
           <Route path="/login" element={<LoginPage />} />
@@ -27,7 +19,12 @@ const App = () => {
           <Route path="/request-form" element={<RequestFormPage />} />
           <Route path="/request/:id" element={<RequestDetailPage />} />
           <Route path="/guide" element={<GuidePage />} />
-          <Route path="/menu" element={<Menu isOpen={true} onClose={() => window.history.back()} />} />
+          <Route
+            path="/menu"
+            element={
+              <Menu isOpen={true} onClose={() => window.history.back()} />
+            }
+          />
         </Routes>
       </div>
     </Router>

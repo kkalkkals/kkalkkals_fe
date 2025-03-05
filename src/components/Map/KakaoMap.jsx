@@ -1,6 +1,8 @@
-// src/components/Map/KakaoMap.jsx
 import React, { useEffect, useState } from 'react';
 import { Map, MapMarker, CustomOverlayMap } from 'react-kakao-maps-sdk';
+
+// kakao 객체를 window에서 가져오기
+const { kakao } = window;
 
 const KakaoMap = () => {
   const [center, setCenter] = useState({ lat: 33.450701, lng: 126.570667 });
@@ -44,6 +46,37 @@ const KakaoMap = () => {
     }
   }, []);
 
+  // 지도 초기화 시 크기 설정 부분
+  useEffect(() => {
+    if (!kakao) {
+      console.error('Kakao maps SDK not loaded');
+      return;
+    }
+    
+    const container = document.getElementById('map');
+    const options = {
+      center: new kakao.maps.LatLng(37.566826, 126.9786567),
+      level: 3
+    };
+    
+    // 지도 생성 후 크기 재설정
+    const map = new kakao.maps.Map(container, options);
+    
+    // 지도 크기를 컨테이너에 맞게 조정
+    const resizeMap = () => {
+      const mapContainer = document.getElementById('map');
+      const parentWidth = mapContainer.parentElement.clientWidth;
+      mapContainer.style.width = parentWidth + 'px';
+      map.relayout(); // 지도 레이아웃 재설정
+    };
+    
+    // 초기 로드 및 리사이즈 시 지도 크기 조정
+    resizeMap();
+    window.addEventListener('resize', resizeMap);
+    
+    return () => window.removeEventListener('resize', resizeMap);
+  }, []);
+
   // 마커 아이콘 설정
   const getMarkerImage = (type) => {
     switch (type) {
@@ -64,6 +97,15 @@ const KakaoMap = () => {
 
   return (
     <div className="w-full h-full">
+      <div 
+        id="map" 
+        style={{ 
+          width: '100%',       // 부모 요소의 너비에 맞춤
+          height: '100vh',     // 높이는 유지
+          position: 'relative',
+          overflow: 'hidden'   // 넘치는 부분 숨김
+        }}
+      ></div>
       <Map
         center={center}
         level={level}
