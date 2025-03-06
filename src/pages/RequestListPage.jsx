@@ -53,7 +53,7 @@ const RequestListPage = () => {
   const [requests, setRequests] = useState([]);
   const [filter, setFilter] = useState('최신순');
   const [showCompleted, setShowCompleted] = useState(false);
-  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
     // API 호출 대신 임시 데이터 사용
@@ -99,32 +99,56 @@ const RequestListPage = () => {
 
   return (
     <div className="list-container">
-      <Header title="배출 대행" />
+      <div className="relative">
+        <Header 
+          title="배출 대행" 
+          showBack={true}
+          showMenu={false}
+        />
+        <div className="absolute right-4 top-3">
+          <button
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            className="text-white text-2xl"
+          >
+            ☰
+          </button>
+          {isDropdownOpen && (
+            <div className="absolute right-0 top-full mt-1 w-32 bg-white rounded-lg shadow-lg overflow-hidden z-50">
+              <button
+                onClick={() => {
+                  navigate('/');
+                  setIsDropdownOpen(false);
+                }}
+                className="w-full px-4 py-3 text-left hover:bg-gray-50"
+              >
+                <span className="text-gray-700">지도</span>
+              </button>
+              <button
+                onClick={() => {
+                  navigate('/guide');
+                  setIsDropdownOpen(false);
+                }}
+                className="w-full px-4 py-3 text-left hover:bg-gray-50 border-t border-gray-100"
+              >
+                <span className="text-gray-700">클린하우스란?</span>
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
       
       <div className="list-content">
-        <div className="filter-bar">
-          <button
-            onClick={() => setIsFilterModalOpen(true)}
-            className="filter-button"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="filter-icon">
-              <path d="M3 18h6v-2H3v2zM3 6v2h18V6H3zm0 7h12v-2H3v2z" fill="#000"/>
-            </svg>
-            {filter}
-          </button>
-          
-          <div className="show-completed-toggle">
-            <input 
-              type="checkbox" 
-              id="show-completed" 
-              className="toggle-checkbox"
-              checked={showCompleted}
-              onChange={(e) => setShowCompleted(e.target.checked)}
-            />
-            <label htmlFor="show-completed" className="toggle-label">
-              배출 완료된 건 보기
-            </label>
-          </div>
+        <div className="show-completed-toggle mt-4 px-4">
+          <input 
+            type="checkbox" 
+            id="show-completed" 
+            className="toggle-checkbox"
+            checked={showCompleted}
+            onChange={(e) => setShowCompleted(e.target.checked)}
+          />
+          <label htmlFor="show-completed" className="toggle-label">
+            배출 완료된 건 보기
+          </label>
         </div>
         
         {filteredRequests().map(request => (
@@ -171,41 +195,6 @@ const RequestListPage = () => {
           </div>
         ))}
       </div>
-      
-      {/* 필터 모달 */}
-      {isFilterModalOpen && (
-        <div className="modal-overlay">
-          <div className="filter-modal">
-            <h2 className="modal-title">정렬</h2>
-            <div className="sort-options">
-              <button 
-                className={`sort-option ${filter === '최신순' ? 'sort-selected' : ''}`}
-                onClick={() => {
-                  setFilter('최신순');
-                  setIsFilterModalOpen(false);
-                }}
-              >
-                최신순
-              </button>
-              <button
-                className={`sort-option ${filter === '오래된순' ? 'sort-selected' : ''}`}
-                onClick={() => {
-                  setFilter('오래된순');
-                  setIsFilterModalOpen(false);
-                }}
-              >
-                오래된순
-              </button>
-            </div>
-            <button 
-              className="close-modal-button"
-              onClick={() => setIsFilterModalOpen(false)}
-            >
-              닫기
-            </button>
-          </div>
-        </div>
-      )}
       
       <TabMenu activeTab="request-list" />
     </div>
