@@ -2,11 +2,13 @@ import React, { useEffect, useRef, useState } from "react";
 import { Map, MapMarker, CustomOverlayMap, MarkerClusterer } from "react-kakao-maps-sdk";
 
 import axios from "axios";
+import SearchBar from "./SearchBar";
+import Hamburger from '../common/Hamburger';
 
 const KakaoMap = () => {
   const kakaoApiKey = process.env.REACT_APP_KAKAO_MAP_API_KEY;
   const mapRef = useRef(null);
-  const [center, setCenter] = useState({ lat: 33.450701, lng: 126.570667 });
+  const [center, setCenter] = useState({ lat: 33.487182768, lng: 126.531717176 });
   const [currentPosition, setCurrentPosition] = useState(null);
   const [level, setLevel] = useState(3);
   const [selectedFacility, setSelectedFacility] = useState(null);
@@ -22,6 +24,57 @@ const KakaoMap = () => {
 
   const goormSquare = { lat: 33.487182768, lng: 126.531717176 };
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  
+  // 제주도 읍면동 데이터
+  const jejuDistricts = [
+    { name: "제주시 한림읍", lat: 33.4089, lng: 126.2690, level: 7 },
+    { name: "제주시 애월읍", lat: 33.4631, lng: 126.3312, level: 7 },
+    { name: "제주시 구좌읍", lat: 33.5519, lng: 126.7159, level: 7 },
+    { name: "제주시 조천읍", lat: 33.5375, lng: 126.6341, level: 7 },
+    { name: "제주시 한경면", lat: 33.3435, lng: 126.1726, level: 7 },
+    { name: "제주시 추자면", lat: 33.9471, lng: 126.3095, level: 7 },
+    { name: "제주시 우도면", lat: 33.5032, lng: 126.9521, level: 7 },
+    { name: "제주시 일도1동", lat: 33.5138, lng: 126.5230, level: 5 },
+    { name: "제주시 일도2동", lat: 33.5099, lng: 126.5294, level: 5 },
+    { name: "제주시 이도1동", lat: 33.5099, lng: 126.5230, level: 5 },
+    { name: "제주시 이도2동", lat: 33.5001, lng: 126.5294, level: 5 },
+    { name: "제주시 삼도1동", lat: 33.5138, lng: 126.5166, level: 5 },
+    { name: "제주시 삼도2동", lat: 33.5099, lng: 126.5166, level: 5 },
+    { name: "제주시 용담1동", lat: 33.5138, lng: 126.5102, level: 5 },
+    { name: "제주시 용담2동", lat: 33.5099, lng: 126.5102, level: 5 },
+    { name: "제주시 건입동", lat: 33.5177, lng: 126.5294, level: 5 },
+    { name: "제주시 화북동", lat: 33.5256, lng: 126.5358, level: 5 },
+    { name: "제주시 삼양동", lat: 33.5256, lng: 126.5486, level: 5 },
+    { name: "제주시 봉개동", lat: 33.4982, lng: 126.5934, level: 5 },
+    { name: "제주시 아라동", lat: 33.4825, lng: 126.5486, level: 5 },
+    { name: "제주시 오라동", lat: 33.4825, lng: 126.5102, level: 5 },
+    { name: "제주시 연동", lat: 33.4904, lng: 126.5038, level: 5 },
+    { name: "제주시 노형동", lat: 33.4825, lng: 126.4806, level: 5 },
+    { name: "제주시 외도동", lat: 33.4904, lng: 126.4358, level: 5 },
+    { name: "제주시 이호동", lat: 33.4982, lng: 126.4550, level: 5 },
+    { name: "제주시 도두동", lat: 33.5060, lng: 126.4614, level: 5 },
+    { name: "서귀포시 대정읍", lat: 33.2237, lng: 126.2501, level: 7 },
+    { name: "서귀포시 남원읍", lat: 33.2765, lng: 126.7159, level: 7 },
+    { name: "서귀포시 성산읍", lat: 33.3826, lng: 126.8806, level: 7 },
+    { name: "서귀포시 안덕면", lat: 33.2518, lng: 126.3567, level: 7 },
+    { name: "서귀포시 표선면", lat: 33.3264, lng: 126.8231, level: 7 },
+    { name: "서귀포시 송산동", lat: 33.2518, lng: 126.5614, level: 5 },
+    { name: "서귀포시 정방동", lat: 33.2440, lng: 126.5678, level: 5 },
+    { name: "서귀포시 중앙동", lat: 33.2518, lng: 126.5678, level: 5 },
+    { name: "서귀포시 천지동", lat: 33.2440, lng: 126.5614, level: 5 },
+    { name: "서귀포시 효돈동", lat: 33.2518, lng: 126.5934, level: 5 },
+    { name: "서귀포시 영천동", lat: 33.2596, lng: 126.5742, level: 5 },
+    { name: "서귀포시 동홍동", lat: 33.2596, lng: 126.5806, level: 5 },
+    { name: "서귀포시 서홍동", lat: 33.2596, lng: 126.5550, level: 5 },
+    { name: "서귀포시 대륜동", lat: 33.2518, lng: 126.5486, level: 5 },
+    { name: "서귀포시 대천동", lat: 33.2518, lng: 126.5358, level: 5 },
+    { name: "서귀포시 중문동", lat: 33.2518, lng: 126.4230, level: 5 },
+    { name: "서귀포시 예래동", lat: 33.2518, lng: 126.3903, level: 5 }
+  ];
+
   // 카카오맵 SDK 로딩 확인
   useEffect(() => {
     if (window.kakao && window.kakao.maps) {
@@ -35,21 +88,21 @@ const KakaoMap = () => {
     }
   }, []);
 
-  // 현재 위치 가져오기
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          setCurrentPosition({ lat: latitude, lng: longitude });
-          setCenter({ lat: latitude, lng: longitude });
-        },
-        (error) => {
-          console.error("Error getting current position:", error);
-        }
-      );
-    }
-  }, []);
+  // // 현재 위치 가져오기 htts에서만 geolocation 이용 가능
+  // useEffect(() => {
+  //   if (navigator.geolocation) {
+  //     navigator.geolocation.getCurrentPosition(
+  //       (position) => {
+  //         const { latitude, longitude } = position.coords;
+  //         setCurrentPosition({ lat: latitude, lng: longitude });
+  //         setCenter({ lat: latitude, lng: longitude });
+  //       },
+  //       (error) => {
+  //         console.error("Error getting current position:", error);
+  //       }
+  //     );
+  //   }
+  // }, []);
 
 
     // 구름스퀘어 위치로 이동하는 함수
@@ -61,7 +114,6 @@ const KakaoMap = () => {
           goormSquare.lng
         );
         
-        // 지도 이동 (패닝 애니메이션 적용)
         mapRef.current.setCenter(moveLatLng);
         mapRef.current.setLevel(3);
         
@@ -193,15 +245,66 @@ const handleMapClick = () => {
   setSelectedRequestGroup(null);
 };
 
+// 검색어 변경 핸들러
+const handleSearchChange = (e) => {
+  const value = e.target.value;
+  setSearchTerm(value);
+  
+  if (value.trim() === "") {
+    setSearchResults([]);
+    setShowSearchResults(false);
+    return;
+  }
+  
+  // 검색어에 맞는 동네 필터링
+  const filtered = jejuDistricts.filter(district => 
+    district.name.toLowerCase().includes(value.toLowerCase())
+  );
+  
+  setSearchResults(filtered);
+  setShowSearchResults(true);
+};
+
+// 동네 선택 핸들러
+const handleDistrictSelect = (district) => {
+  // 선택한 동네로 지도 이동
+  if (mapRef.current) {
+    const moveLatLng = new window.kakao.maps.LatLng(
+      district.lat,
+      district.lng
+    );
+    
+    mapRef.current.setCenter(moveLatLng);
+    mapRef.current.setLevel(district.level); // 동네 크기에 맞게 줌 레벨 설정
+    
+    setCenter({ lat: district.lat, lng: district.lng });
+    setLevel(district.level);
+  }
+  
+  // 검색 UI 초기화
+  setSearchTerm(district.name);
+  setShowSearchResults(false);
+};
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full relative">
+      <div className="absolute flex items-center justify-center top-4 left-1/2 transform -translate-x-1/2 z-10 w-4/5 max-w-md opacity-90">
+        <div className="relative flex items-center justify-center">
+          <SearchBar 
+            onSearch={handleSearchChange}
+            districts={jejuDistricts} 
+            onDistrictSelect={handleDistrictSelect} 
+        />
+        <Hamburger className="opacity-90"/>
+        </div>
+      </div>
+
       <Map
         center={center}
         level={level}
         style={{ width: "100%", height: "100vh" }}
         onZoomChanged={(map) => setLevel(map.getLevel())}
-        onBoundsChanged={handleBoundsChanged} // 지도 이동 시 바운더리 변경 감지
+        onBoundsChanged={handleBoundsChanged}
         onCreate={setMapInstance}
         onClick={handleMapClick}
       >
