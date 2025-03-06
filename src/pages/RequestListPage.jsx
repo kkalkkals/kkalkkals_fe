@@ -43,7 +43,7 @@ const RequestListPage = () => {
             : post.status === 1
               ? "수거중"
               : "완료됨",
-        trashType: post.trash_type,
+        trashType: getTypeLabel(post.trash_type),
         trashAmount: `${post.trash_amount}L`,
         location: post.address,
         requestDetails: post.request_term || "요청사항 없음",
@@ -55,6 +55,23 @@ const RequestListPage = () => {
     } catch (error) {
       console.error("Error fetching posts:", error);
     }
+  };
+
+  const trashTypeOptions = [
+    { id: 0, label: "플라스틱류" },
+    { id: 1, label: "종이류" },
+    { id: 2, label: "캔·고철류" },
+    { id: 3, label: "스티로폼·비닐류" },
+    { id: 4, label: "플라스틱류" },
+    { id: 5, label: "불에 타는 쓰레기·병류" },
+    { id: 6, label: "스티로폼" },
+    { id: 7, label: "일반쓰레기" },
+    { id: 8, label: "음식물쓰레기" },
+  ];
+
+  const getTypeLabel = (status) => {
+    const option = trashTypeOptions.find((option) => option.id === status);
+    return option ? option.label : "알 수 없음"; // 값이 없을 경우 기본값 설정
   };
 
   // 필터링된 요청 목록
