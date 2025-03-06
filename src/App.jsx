@@ -12,8 +12,8 @@ const App = () => {
     <Router>
       <div className="max-w-md mx-auto min-h-screen bg-gray-50 overflow-x-hidden">
         <Routes>
-          <Route path="/" element={<MainPage />} />
-          <Route path="/onboarding" element={<OnboardingPage />} />
+          <Route path="/" element={<OnboardingPage/>} />
+          <Route path="/map" element={<MainPage/>} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/request-list" element={<RequestListPage />} />
           <Route path="/request-form" element={<RequestFormPage />} />

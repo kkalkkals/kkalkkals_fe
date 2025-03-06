@@ -82,7 +82,7 @@ const OnboardingPage = () => {
             </div>
 
             {/* 하단 고정 버튼 */}
-            <button className="onboarding-button" onClick={() => navigate("/")}>
+            <button className="onboarding-button" onClick={() => navigate("/map")}>
                 배출 지도 바로가기
             </button>
         </div>
