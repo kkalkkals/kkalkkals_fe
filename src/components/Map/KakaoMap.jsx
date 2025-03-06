@@ -12,6 +12,13 @@ const KakaoMap = () => {
   const [selectedFacility, setSelectedFacility] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [facilities, setFacilities] = useState([]); // 마커 데이터
+  const [pickupRequests, setPickupRequests] = useState([]); // 배출 대행 요청 데이터 추가
+
+  const [selectedRequest, setSelectedRequest] = useState(null);
+  const [selectedRequestGroup, setSelectedRequestGroup] = useState(null); // 같은 위치 요청 그룹
+  
+  const [showFacilities, setShowFacilities] = useState(true);  // 클린하우스, 재활용센터 보기 여부
+  const [showPickupRequests, setShowPickupRequests] = useState(true);  // 배출 대행 요청 보기 여부
 
   const goormSquare = { lat: 33.487182768, lng: 126.531717176 };
 
@@ -84,14 +91,16 @@ const KakaoMap = () => {
     const ne = bounds.getNorthEast(); // 북동쪽 좌표
 
     const newBounds = {
-      swLat: sw.getLat(),
-      swLng: sw.getLng(),
-      neLat: ne.getLat(),
-      neLng: ne.getLng(),
+        swLat: sw.getLat(),
+        swLng: sw.getLng(),
+        neLat: ne.getLat(),
+        neLng: ne.getLng(),
     };
 
-    fetchFacilities(newBounds);
-  };
+    if (showFacilities) fetchFacilities(newBounds); // 클린하우스, 재활용센터 데이터 가져오기
+    if (showPickupRequests) fetchPickupRequests(newBounds); // 배출 대행 요청 데이터 가져오기
+};
+
 
   // 마커 아이콘 설정 (시설 유형에 따라 구분)
 const getMarkerImage = (type) => {
@@ -124,6 +133,49 @@ const getMarkerImage = (type) => {
     );
   }
 
+const fetchPickupRequests = async (bounds) => {
+  try {
+      const response = await axios.get(
+          `http://3.37.88.60/api/pickup/active/bounds?minLat=${bounds.swLat}&maxLat=${bounds.neLat}&minLng=${bounds.swLng}&maxLng=${bounds.neLng}`
+      );
+      setPickupRequests(response.data.data);
+  } catch (error) {
+      console.error("Error fetching pickup requests:", error);
+  }
+};
+
+// 같은 위치에 있는 요청을 그룹화
+const groupedPickupRequests = pickupRequests.reduce((acc, request) => {
+  const key = `${request.latitude}-${request.longitude}`;
+  if (!acc[key]) acc[key] = [];
+  acc[key].push(request);
+  return acc;
+}, {});
+
+// 마커 클릭 시 해당 위치의 모든 요청을 표시
+const handleRequestMarkerClick = (lat, lng) => {
+  const key = `${lat}-${lng}`;
+  const requests = groupedPickupRequests[key];
+
+  if (requests.length > 1) {
+      // 같은 위치의 요청이 여러 개 있는 경우
+      setSelectedRequestGroup(requests);
+      setSelectedRequest(null);
+  } else {
+      // 단일 요청일 경우
+      setSelectedRequest(requests[0]);
+      setSelectedRequestGroup(null);
+  }
+};
+
+// 지도 클릭 시 오버레이 닫기
+const handleMapClick = () => {
+  setSelectedRequest(null);
+  setSelectedRequestGroup(null);
+  setSelectedFacility(null);
+};
+
+
   return (
     <div className="w-full h-full">
       <Map
@@ -133,6 +185,7 @@ const getMarkerImage = (type) => {
         onZoomChanged={(map) => setLevel(map.getLevel())}
         onBoundsChanged={handleBoundsChanged} // 지도 이동 시 바운더리 변경 감지
         onCreate={setMapInstance}
+        onClick={handleMapClick}
       >
 
         <MarkerClusterer
@@ -191,6 +244,21 @@ const getMarkerImage = (type) => {
             </div>
           </CustomOverlayMap>
         )}
+
+        {/* 배출 대행 요청 마커 */}
+        {showPickupRequests &&
+            Object.values(groupedPickupRequests).map((group) => (
+                <MapMarker
+                    key={`${group[0].latitude}-${group[0].longitude}`}
+                    position={{ lat: group[0].latitude, lng: group[0].longitude }}
+                    image={{
+                        src: "/images/marker-red.png",  // 배출 요청 마커 아이콘
+                        size: { width: 24, height: 35 },
+                    }}
+                    onClick={() => handleRequestMarkerClick(group[0].latitude, group[0].longitude)}
+                />
+            ))
+        }
       </Map>
 
       {/* 현재 위치로 이동 버튼 */}
