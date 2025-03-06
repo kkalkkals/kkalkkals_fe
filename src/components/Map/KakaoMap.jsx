@@ -125,6 +125,7 @@ const getMarkerImage = (type) => {
   };
 
   const handleKakaoMap = (e) => {
+    console.log(selectedFacility);
     if (!selectedFacility || !currentPosition) {
       alert("현재 위치 또는 선택한 시설 정보가 없습니다.");
       return;
@@ -136,25 +137,12 @@ const getMarkerImage = (type) => {
     // 도착지 좌표
     const destinationX = selectedFacility.longitude;
     const destinationY = selectedFacility.latitude;
-    
-    // 출발지 좌표
-    const startX = currentPosition.lng;
-    const startY = currentPosition.lat;
-    
-    // 카카오맵 길찾기 URL 생성
-    // sX, sY: 출발지 좌표(경도, 위도)
-    // eX, eY: 도착지 좌표(경도, 위도)
-    // 카카오맵은 x가 경도, y가 위도를 의미함
-    // const kakaoMapUrl = `https://map.kakao.com/link/to/${destinationName},${destinationY},${destinationX}/from/${startY},${startX}/route`;
+
     const kakaoMapUrl = `https://map.kakao.com/link/to/${destinationName},${destinationY},${destinationX}`;
+    console.log(kakaoMapUrl);
     // 새 창에서 카카오맵 열기
     window.open(kakaoMapUrl, '_blank');
   };
-
-  // const handleMapClick = (map, mouseEvent) => {
-  //   // 선택된 시설 정보 초기화
-  //   setSelectedFacility(null);
-  // };
 
   if (!isLoaded) {
     return (
@@ -203,7 +191,6 @@ const handleRequestMarkerClick = (lat, lng) => {
 const handleMapClick = () => {
   setSelectedRequest(null);
   setSelectedRequestGroup(null);
-  setSelectedFacility(null);
 };
 
 
