@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Map, MapMarker, CustomOverlayMap } from "react-kakao-maps-sdk";
+import { Map, MapMarker, CustomOverlayMap, MarkerClusterer } from "react-kakao-maps-sdk";
 
 import axios from "axios";
 
@@ -40,25 +40,7 @@ const KakaoMap = () => {
     }
   }, []);
 
-  // 시설 데이터 (클린하우스, 재활용도움센터 등)
-  const facilityData = [
-    {
-      id: 1,
-      type: "cleanhouse",
-      name: "클린하우스",
-      address: "제주특별자치도 제주시 한림읍 대림리 1298-1",
-      operationHours: "16:00 ~ 04:00",
-      position: { lat: 33.450701, lng: 126.570667 },
-    },
-    {
-      id: 2,
-      type: "recycling",
-      name: "재활용도움센터",
-      address: "제주특별자치도 제주시 한림읍 대림리 1298-1",
-      operationHours: "07:00 ~ 22:00",
-      position: { lat: 33.452564, lng: 126.574041 },
-    },
-  ];
+
   // 지도 바운더리가 변경될 때 API 요청
   const fetchFacilities = async (bounds) => {
     try {
@@ -87,23 +69,23 @@ const KakaoMap = () => {
     fetchFacilities(newBounds);
   };
 
-  // 마커 아이콘 설정
-  const getMarkerImage = (type) => {
-    switch (type) {
-      case "cleanhouse":
-        return {
-          src: "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
-          size: { width: 24, height: 35 },
-        };
-      case "recycling":
-        return {
-          src: "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
-          size: { width: 24, height: 35 },
-        };
-      default:
-        return null;
-    }
-  };
+  // 마커 아이콘 설정 (시설 유형에 따라 구분)
+const getMarkerImage = (type) => {
+  switch (type) {
+    case "cleanhouse":
+      return {
+        src: "https://t1.daumcdn.net/localimg/localimages/07/2018/pc/img/marker_spot.png",
+        size: { width: 24, height: 35 },
+      };
+    case "recycling":
+      return {
+        src: "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
+        size: { width: 24, height: 35 },
+      };
+    default:
+      return null;
+  }
+};
 
   if (!isLoaded) {
     return (
@@ -122,15 +104,34 @@ const KakaoMap = () => {
         onZoomChanged={(map) => setLevel(map.getLevel())}
         onBoundsChanged={handleBoundsChanged} // 지도 이동 시 바운더리 변경 감지
       >
-        {/* 시설 마커 */}
-        {facilities.map((facility) => (
-          <MapMarker
-            key={facility.id}
-            position={{ lat: facility.latitude, lng: facility.longitude }}
-            image={getMarkerImage(facility.type)}
-            onClick={() => setSelectedFacility(facility)}
-          />
-        ))}
+
+        <MarkerClusterer
+          averageCenter
+          minLevel={5}
+          styles={[
+            {
+              width: "40px", // 클러스터 크기
+              height: "40px",
+              background: "rgba(51, 102, 204, 0.8)",
+              borderRadius: "50%",
+              textAlign: "center",
+              lineHeight: "40px",
+              color: "white",
+              fontWeight: "bold",
+              fontSize: "14px",
+            },
+          ]}
+
+        >
+          {facilities.map((facility) => (
+            <MapMarker
+              key={facility.id}
+              position={{ lat: facility.latitude, lng: facility.longitude }}
+              image={getMarkerImage(facility.type)}
+              onClick={() => setSelectedFacility(facility)}
+            />
+          ))}
+        </MarkerClusterer>
 
         {/* 현재 위치 마커 */}
         {currentPosition && (
@@ -152,11 +153,11 @@ const KakaoMap = () => {
             yAnchor={1.5}
           >
             <div className="p-3 bg-white rounded-lg shadow-md">
-              <h3 className="font-bold text-lg">{selectedFacility.name}</h3>
+              <h3 className="font-bold text-lg">
+                {selectedFacility.type === "cleanhouse" ? "📍 클린하우스" : "📍 재활용도움센터"}
+              </h3>
               <p className="text-sm">{selectedFacility.address}</p>
-              <p className="text-sm">
-                운영시간: {selectedFacility.operation_hours}
-              </p>
+              <p className="text-sm">운영시간: {selectedFacility.operation_hours}</p>
             </div>
           </CustomOverlayMap>
         )}
