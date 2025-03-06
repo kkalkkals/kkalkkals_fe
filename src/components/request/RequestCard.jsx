@@ -53,7 +53,7 @@ const RequestCard = ({ request, onAccept, onComplete }) => {
           <span className="value">{request.location}</span>
         </div>
         <div className="detail-item">
-          <span className="label">금액</span>
+          <span className="label">수고비</span>
           <span className="value">
             {request.money.toLocaleString("ko-KR")}원
           </span>

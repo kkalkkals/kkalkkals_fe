@@ -158,7 +158,7 @@ const RequestDetailPage = () => {
             <span className="value">{request.address}</span>
           </div>
           <div className="detail-item">
-            <span className="label">금액</span>
+            <span className="label">수고비</span>
             <span className="value">
               {request.money.toLocaleString("ko-KR")}원
             </span>
