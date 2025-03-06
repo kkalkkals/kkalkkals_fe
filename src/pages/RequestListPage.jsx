@@ -113,7 +113,7 @@ const RequestListPage = () => {
       <div className="list-content">
         <div className="filter-bar">
           <button
-            onClick={() => navigate('/request/create')}
+            onClick={() => navigate('/request-form')}
             className="create-request-button"
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
