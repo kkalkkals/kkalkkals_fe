@@ -6,14 +6,13 @@ import RequestCard from "../components/request/RequestCard"; // RequestCard 적�
 import "../styles/requestList.css";
 import axios from "axios";
 
-const API_URL = "http://3.37.88.60:80/posts/all"; // 백엔드 API 주소
+const API_URL = "http://3.37.88.60/posts/all"; // 백엔드 API 주소
 
 const RequestListPage = () => {
   const navigate = useNavigate();
   const [requests, setRequests] = useState([]);
   const [filter, setFilter] = useState("최신순");
   const [showCompleted, setShowCompleted] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // 모달 상태 추가
   const [isAcceptModalOpen, setIsAcceptModalOpen] = useState(false);
@@ -49,6 +48,7 @@ const RequestListPage = () => {
         location: post.address,
         requestDetails: post.request_term || "요청사항 없음",
         image: "http://3.37.88.60/" + post.image,
+        money: post.money,
       }));
 
       setRequests(formattedRequests);
