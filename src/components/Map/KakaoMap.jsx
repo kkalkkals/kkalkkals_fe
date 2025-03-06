@@ -88,6 +88,22 @@ const KakaoMap = () => {
     }
   }, []);
 
+  useEffect(() => {
+    if (mapRef.current) {
+      const map = mapRef.current;
+  
+      // 제주도 경계 설정 (서남쪽, 동북쪽 좌표)
+      const sw = new window.kakao.maps.LatLng(33.11, 126.05); // 서남쪽
+      const ne = new window.kakao.maps.LatLng(34.00, 127.00); // 동북쪽
+      const jejuBounds = new window.kakao.maps.LatLngBounds(sw, ne);
+  
+      // 지도 초기화 시 제주도 영역으로 제한
+      map.setBounds(jejuBounds);
+    }
+  }, [isLoaded]); // 맵이 로드되었을 때 실행
+  
+  
+
   // // 현재 위치 가져오기 htts에서만 geolocation 이용 가능
   // useEffect(() => {
   //   if (navigator.geolocation) {
@@ -103,6 +119,25 @@ const KakaoMap = () => {
   //     );
   //   }
   // }, []);
+
+  const handleMapBoundsLimit = () => {
+    if (mapRef.current) {
+      const map = mapRef.current;
+  
+      // 제주도 경계 설정
+      const sw = new window.kakao.maps.LatLng(33.11, 126.05); // 서남쪽
+      const ne = new window.kakao.maps.LatLng(34.00, 127.00); // 동북쪽
+      const jejuBounds = new window.kakao.maps.LatLngBounds(sw, ne);
+  
+      // 현재 지도 중심 좌표 확인
+      const center = map.getCenter();
+  
+      // 사용자가 제주도를 벗어나면 다시 제주도 중심으로 이동
+      if (!jejuBounds.contain(center)) {
+        map.setBounds(jejuBounds);
+      }
+    }
+  };
 
 
     // 구름스퀘어 위치로 이동하는 함수
@@ -303,8 +338,9 @@ const handleDistrictSelect = (district) => {
         center={center}
         level={level}
         style={{ width: "100%", height: "100vh" }}
-        onZoomChanged={(map) => setLevel(map.getLevel())}
-        onBoundsChanged={handleBoundsChanged}
+        onZoomChanged={handleMapBoundsLimit}  // 줌 변경 시 제주도 밖으로 못 나가게
+        onDragEnd={handleMapBoundsLimit}  // 드래그 후 제주도 밖으로 못 나가게
+        onBoundsChanged={handleBoundsChanged} // 바운드 변경 감지
         onCreate={setMapInstance}
         onClick={handleMapClick}
       >
