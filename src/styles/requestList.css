@@ -326,6 +326,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
+  z-index: 10;
   box-shadow: 0 4px 12px rgba(255, 216, 168, 0.3);
 }
 
