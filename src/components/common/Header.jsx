@@ -1,9 +1,21 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import '../../styles/header.css';
 
 const Header = ({ title, showBack = true, showMenu = true }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const menuItems = location.pathname === '/' 
+    ? [
+        { label: '배출 대행', path: '/request-list' },
+        { label: '클린하우스란?', path: '/guide' }
+      ]
+    : [
+        { label: '지도', path: '/' },
+        { label: '클린하우스란?', path: '/guide' }
+      ];
 
   return (
     <div className="relative">
@@ -24,49 +36,39 @@ const Header = ({ title, showBack = true, showMenu = true }) => {
 
         <h1 className="header-title">{title}</h1>
 
-        {showMenu ? (
-          <button
-            className="menu-button"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label="메뉴"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
-            </svg>
-          </button>
-        ) : (
-          <div className="w-8"></div>
+        {showMenu && (
+          <div className="menu-container">
+            <button
+              className="menu-button"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label="메뉴"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+              </svg>
+            </button>
+            
+            {isMenuOpen && (
+              <div className="menu-dropdown">
+                {menuItems.map((item) => (
+                  <button
+                    key={item.path}
+                    onClick={() => {
+                      navigate(item.path);
+                      setIsMenuOpen(false);
+                    }}
+                    className="menu-item"
+                  >
+                    <span>{item.label}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         )}
+        
+        {!showMenu && <div className="w-8"></div>}
       </header>
-
-      {isMenuOpen && (
-        <div className="menu-dropdown">
-          <button
-            onClick={() => {
-              navigate('/');
-              setIsMenuOpen(false);
-            }}
-            className="menu-item"
-          >
-            <span>지도</span>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
-            </svg>
-          </button>
-          <button
-            onClick={() => {
-              navigate('/guide');
-              setIsMenuOpen(false);
-            }}
-            className="menu-item"
-          >
-            <span>클린하우스란?</span>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
-            </svg>
-          </button>
-        </div>
-      )}
     </div>
   );
 };
