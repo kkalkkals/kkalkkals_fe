@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Map, MapMarker, CustomOverlayMap, MarkerClusterer } from "react-kakao-maps-sdk";
-
 import axios from "axios";
 import SearchBar from "./SearchBar";
 import Hamburger from '../common/Hamburger';
+import RequestModal from "../request/RequestModal";
 
 const KakaoMap = () => {
   const kakaoApiKey = process.env.REACT_APP_KAKAO_MAP_API_KEY;
@@ -16,17 +16,47 @@ const KakaoMap = () => {
   const [facilities, setFacilities] = useState([]); // 마커 데이터
   const [pickupRequests, setPickupRequests] = useState([]); // 배출 대행 요청 데이터 추가
 
+    // 필터 상태
+  const [showCleanhouse, setShowCleanhouse] = useState(true);
+  const [showRecycling, setShowRecycling] = useState(true);
+  const [showPickupRequests, setShowPickupRequests] = useState(true);
+
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [selectedRequestGroup, setSelectedRequestGroup] = useState(null); // 같은 위치 요청 그룹
   
   const [showFacilities, setShowFacilities] = useState(true);  // 클린하우스, 재활용센터 보기 여부
-  const [showPickupRequests, setShowPickupRequests] = useState(true);  // 배출 대행 요청 보기 여부
+  // const [showPickupRequests, setShowPickupRequests] = useState(true);  // 배출 대행 요청 보기 여부
 
   const goormSquare = { lat: 33.487182768, lng: 126.531717176 };
+
+  const [modalRequests, setModalRequests] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
+
+
+  // 필터 버튼 이미지
+  const filterButtons = [
+    {
+      name: "클린하우스",
+      state: showCleanhouse,
+      toggle: () => setShowCleanhouse((prev) => !prev),
+      img: "https://t1.daumcdn.net/localimg/localimages/07/2018/pc/img/marker_spot.png",
+    },
+    {
+      name: "재활용센터",
+      state: showRecycling,
+      toggle: () => setShowRecycling((prev) => !prev),
+      img: "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
+    },
+    {
+      name: "대행 요청",
+      state: showPickupRequests,
+      toggle: () => setShowPickupRequests((prev) => !prev),
+      img: "/images/marker-red.png",
+    },
+  ];
   
   // 제주도 읍면동 데이터
   const jejuDistricts = [
@@ -88,6 +118,22 @@ const KakaoMap = () => {
     }
   }, []);
 
+  useEffect(() => {
+    if (mapRef.current) {
+      const map = mapRef.current;
+  
+      // 제주도 경계 설정 (서남쪽, 동북쪽 좌표)
+      const sw = new window.kakao.maps.LatLng(33.11, 126.05); // 서남쪽
+      const ne = new window.kakao.maps.LatLng(34.00, 127.00); // 동북쪽
+      const jejuBounds = new window.kakao.maps.LatLngBounds(sw, ne);
+  
+      // 지도 초기화 시 제주도 영역으로 제한
+      map.setBounds(jejuBounds);
+    }
+  }, [isLoaded]); // 맵이 로드되었을 때 실행
+  
+  
+
   // // 현재 위치 가져오기 htts에서만 geolocation 이용 가능
   // useEffect(() => {
   //   if (navigator.geolocation) {
@@ -103,6 +149,25 @@ const KakaoMap = () => {
   //     );
   //   }
   // }, []);
+
+  const handleMapBoundsLimit = () => {
+    if (mapRef.current) {
+      const map = mapRef.current;
+  
+      // 제주도 경계 설정
+      const sw = new window.kakao.maps.LatLng(33.11, 126.05); // 서남쪽
+      const ne = new window.kakao.maps.LatLng(34.00, 127.00); // 동북쪽
+      const jejuBounds = new window.kakao.maps.LatLngBounds(sw, ne);
+  
+      // 현재 지도 중심 좌표 확인
+      const center = map.getCenter();
+  
+      // 사용자가 제주도를 벗어나면 다시 제주도 중심으로 이동
+      if (!jejuBounds.contain(center)) {
+        map.setBounds(jejuBounds);
+      }
+    }
+  };
 
 
     // 구름스퀘어 위치로 이동하는 함수
@@ -235,19 +300,21 @@ const handleRequestMarkerClick = (lat, lng) => {
   const key = `${lat}-${lng}`;
   const requests = groupedPickupRequests[key];
 
-  if (requests.length > 1) {
-      // 같은 위치의 요청이 여러 개 있는 경우
-      setSelectedRequestGroup(requests);
-      setSelectedRequest(null);
-  } else {
-      // 단일 요청일 경우
-      setSelectedRequest(requests[0]);
-      setSelectedRequestGroup(null);
+  if (requests.length > 0) {
+    setModalRequests(requests);  // 요청 개수 관계없이 모달 띄우기
   }
 };
 
+const closeModal = () => {
+  setModalRequests(null);
+};
+
+// {modalRequests && <RequestModal requests={modalRequests} onClose={closeModal} />}
+
+
 // 지도 클릭 시 오버레이 닫기
 const handleMapClick = () => {
+  setSelectedFacility(null); // 선택된 시설 정보 초기화
   setSelectedRequest(null);
   setSelectedRequestGroup(null);
 };
@@ -316,38 +383,100 @@ const handleDistrictSelect = (district) => {
         center={center}
         level={level}
         style={{ width: "100%", height: "100vh" }}
-        onZoomChanged={(map) => setLevel(map.getLevel())}
-        onBoundsChanged={handleBoundsChanged}
+        onZoomChanged={handleMapBoundsLimit}  // 줌 변경 시 제주도 밖으로 못 나가게
+        onDragEnd={handleMapBoundsLimit}  // 드래그 후 제주도 밖으로 못 나가게
+        onBoundsChanged={handleBoundsChanged} // 바운드 변경 감지
         onCreate={setMapInstance}
         onClick={handleMapClick}
       >
-
-        <MarkerClusterer
-          averageCenter
-          minLevel={5}
-          styles={[
-            {
-              width: "40px", // 클러스터 크기
-              height: "40px",
-              background: "rgba(51, 102, 204, 0.8)",
+        {/* 클린하우스 마커 클러스터링 */}
+        {showCleanhouse && (
+          <MarkerClusterer
+            averageCenter
+            minLevel={5}
+            styles={[{
+              width: "40px", height: "40px",
+              background: "rgba(35, 140, 250, 0.7)", // 연한 블루
               borderRadius: "50%",
-              textAlign: "center",
-              lineHeight: "40px",
-              color: "white",
-              fontWeight: "bold",
-              fontSize: "14px",
-            },
-          ]}
+              textAlign: "center", lineHeight: "40px",
+              color: "white", fontWeight: "bold", fontSize: "14px",
+            }]}
+          >
+            {facilities
+              .filter(facility => facility.type === "cleanhouse")
+              .map(facility => (
+                <MapMarker
+                  key={facility.id}
+                  position={{ lat: facility.latitude, lng: facility.longitude }}
+                  image={{
+                    src: "https://t1.daumcdn.net/localimg/localimages/07/2018/pc/img/marker_spot.png",
+                    size: { width: 24, height: 35 },
+                  }}
+                  onClick={() => setSelectedFacility(facility)}
+                />
+              ))}
+          </MarkerClusterer>
+        )}
 
-        >
-          {facilities.map((facility) => (
-            <MapMarker
-              key={facility.id}
-              position={{ lat: facility.latitude, lng: facility.longitude }}
-              image={getMarkerImage(facility.type)}
-              onClick={() => setSelectedFacility(facility)}/>
-          ))}
-        </MarkerClusterer>
+        {/* 재활용센터 마커 클러스터링 */}
+        {showRecycling && (
+          <MarkerClusterer
+            averageCenter
+            minLevel={5}
+            styles={[{
+              width: "40px", height: "40px",
+              background: "rgba(255, 194, 0, 0.7)", // 연한 노랑
+              borderRadius: "50%",
+              textAlign: "center", lineHeight: "40px",
+              color: "white", fontWeight: "bold", fontSize: "14px",
+            }]}
+          >
+            {facilities
+              .filter(facility => facility.type === "recycling")
+              .map(facility => (
+                <MapMarker
+                  key={facility.id}
+                  position={{ lat: facility.latitude, lng: facility.longitude }}
+                  image={{
+                    src: "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
+                    size: { width: 24, height: 35 },
+                  }}
+                  onClick={() => setSelectedFacility(facility)}
+                />
+              ))}
+          </MarkerClusterer>
+        )}
+
+        {/* 배출 요청 마커 클러스터링 */}
+        {showPickupRequests && Object.keys(groupedPickupRequests).length > 0 && (
+          <MarkerClusterer
+            averageCenter
+            minLevel={5}
+            styles={[{
+              width: "40px", height: "40px",
+              background: "rgba(255, 61, 0, 0.7)", // 연한 빨강
+              borderRadius: "50%",
+              textAlign: "center", lineHeight: "40px",
+              color: "white", fontWeight: "bold", fontSize: "14px",
+            }]}
+          >
+            {Object.keys(groupedPickupRequests).map((key) => {
+              const requestsAtSameLocation = groupedPickupRequests[key]; // 해당 좌표의 요청들
+              const firstRequest = requestsAtSameLocation[0]; // 대표 요청만 사용
+              return (
+                <MapMarker
+                  key={key}
+                  position={{ lat: firstRequest.latitude, lng: firstRequest.longitude }}
+                  image={{
+                    src: "/images/marker-red.png",
+                    size: { width: 24, height: 35 },
+                  }}
+                  onClick={() => handleRequestMarkerClick(firstRequest.latitude, firstRequest.longitude)}
+                />
+              );
+            })}
+          </MarkerClusterer>
+        )}
 
         {/* 현재 위치 마커 */}
         {currentPosition && (
@@ -382,48 +511,57 @@ const handleDistrictSelect = (district) => {
           </CustomOverlayMap>
         )}
 
-        {/* 배출 대행 요청 마커 */}
-        {showPickupRequests &&
-            Object.values(groupedPickupRequests).map((group) => (
-                <MapMarker
-                    key={`${group[0].latitude}-${group[0].longitude}`}
-                    position={{ lat: group[0].latitude, lng: group[0].longitude }}
-                    image={{
-                        src: "/images/marker-red.png",  // 배출 요청 마커 아이콘
-                        size: { width: 24, height: 35 },
-                    }}
-                    onClick={() => handleRequestMarkerClick(group[0].latitude, group[0].longitude)}
-                />
-            ))
-        }
       </Map>
+      {/* 필터 & 현재 위치 버튼 컨테이너 */}
+      <div className="absolute bottom-4 right-4 flex flex-col items-end space-y-3 z-10">
+        {/* 필터 버튼들 */}
+        {filterButtons.map((btn, index) => (
+          <button
+            key={index}
+            title={btn.name}
+            onClick={() => {
+              btn.toggle();
+              handleBoundsChanged(mapRef.current);
+            }}
+            className={`w-12 h-12 flex items-center justify-center rounded-full shadow-md transition ${
+              btn.state ? "bg-white" : "bg-gray-300 opacity-50"
+            }`}
+          >
+            <img src={btn.img} alt={btn.name} className="w-6 h-6" />
+          </button>
+        ))}
 
-      {/* 현재 위치로 이동 버튼 */}
-      <button
-        className="absolute bottom-24 right-4 w-12 h-12 bg-white rounded-full shadow-md flex items-center justify-center z-10"
-        onClick={moveToGoormSquare}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6 text-gray-600"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
+        {/* 현재 위치 버튼 */}
+        <button
+          title="현재 위치"
+          className="w-12 h-12 bg-white rounded-full shadow-md flex items-center justify-center"
+          onClick={moveToGoormSquare}
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-          />
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-          />
-        </svg>
-      </button>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6 text-gray-600"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+            />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+            />
+          </svg>
+        </button>
+      </div>
+
+      {/* 배출 요청 모달 */}
+      {modalRequests && <RequestModal requests={modalRequests} onClose={closeModal} />}
     </div>
   );
 };
