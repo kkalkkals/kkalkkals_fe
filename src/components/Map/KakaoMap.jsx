@@ -1,16 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Map, MapMarker, CustomOverlayMap, MarkerClusterer } from "react-kakao-maps-sdk";
 
 import axios from "axios";
 
 const KakaoMap = () => {
   const kakaoApiKey = process.env.REACT_APP_KAKAO_MAP_API_KEY;
+  const mapRef = useRef(null);
   const [center, setCenter] = useState({ lat: 33.450701, lng: 126.570667 });
   const [currentPosition, setCurrentPosition] = useState(null);
   const [level, setLevel] = useState(3);
   const [selectedFacility, setSelectedFacility] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [facilities, setFacilities] = useState([]); // 마커 데이터
+
+  const goormSquare = { lat: 33.487182768, lng: 126.531717176 };
 
   // 카카오맵 SDK 로딩 확인
   useEffect(() => {
@@ -42,6 +45,26 @@ const KakaoMap = () => {
   }, []);
 
 
+    // 구름스퀘어 위치로 이동하는 함수
+    const moveToGoormSquare = () => {
+      if (mapRef.current) {
+        // 카카오맵 인스턴스 직접 조작
+        const moveLatLng = new window.kakao.maps.LatLng(
+          goormSquare.lat,
+          goormSquare.lng
+        );
+        
+        // 지도 이동 (패닝 애니메이션 적용)
+        // mapRef.current.panTo(moveLatLng);
+        mapRef.current.setCenter(moveLatLng);
+        mapRef.current.setLevel(3);
+        
+        // React 상태도 업데이트 (UI 동기화 위해)
+        setCenter(goormSquare);
+      }
+    };
+    
+    
   // 지도 바운더리가 변경될 때 API 요청
   const fetchFacilities = async (bounds) => {
     try {
@@ -88,6 +111,11 @@ const getMarkerImage = (type) => {
   }
 };
 
+  // 지도 인스턴스 설정 함수
+  const setMapInstance = (map) => {
+    mapRef.current = map;
+  };
+
   if (!isLoaded) {
     return (
       <div className="w-full h-full flex items-center justify-center">
@@ -104,6 +132,7 @@ const getMarkerImage = (type) => {
         style={{ width: "100%", height: "100vh" }}
         onZoomChanged={(map) => setLevel(map.getLevel())}
         onBoundsChanged={handleBoundsChanged} // 지도 이동 시 바운더리 변경 감지
+        onCreate={setMapInstance}
       >
 
         <MarkerClusterer
@@ -138,8 +167,8 @@ const getMarkerImage = (type) => {
         {currentPosition && (
           <CustomOverlayMap position={currentPosition}>
             <div className="relative">
-              <div className="w-6 h-6 bg-blue-400 rounded-full opacity-70 animate-pulse"></div>
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-blue-500 rounded-full"></div>
+              <div className="w-6 h-6 bg-red-400 rounded-full opacity-70 animate-pulse"></div>
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-red-500 rounded-full"></div>
             </div>
           </CustomOverlayMap>
         )}
@@ -167,7 +196,7 @@ const getMarkerImage = (type) => {
       {/* 현재 위치로 이동 버튼 */}
       <button
         className="absolute bottom-24 right-4 w-12 h-12 bg-white rounded-full shadow-md flex items-center justify-center z-10"
-        onClick={() => currentPosition && setCenter(currentPosition)}
+        onClick={moveToGoormSquare}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
