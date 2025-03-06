@@ -144,7 +144,7 @@ const RequestDetailPage = () => {
           />
         )}
 
-        <div className="request-content">
+        <div className="request-content2">
           <div className="detail-item">
             <span className="label">쓰레기 종류</span>
             <span className="value">{getTypeLabel(request.trash_type)}</span>
