@@ -376,33 +376,94 @@ const handleDistrictSelect = (district) => {
         onCreate={setMapInstance}
         onClick={handleMapClick}
       >
-
-        <MarkerClusterer
-          averageCenter
-          minLevel={5}
-          styles={[
-            {
-              width: "40px", // 클러스터 크기
-              height: "40px",
-              background: "rgba(51, 102, 204, 0.8)",
+        {/* 클린하우스 마커 클러스터링 */}
+        {showCleanhouse && (
+          <MarkerClusterer
+            averageCenter
+            minLevel={5}
+            styles={[{
+              width: "40px", height: "40px",
+              background: "rgba(35, 140, 250, 0.7)", // 연한 블루
               borderRadius: "50%",
-              textAlign: "center",
-              lineHeight: "40px",
-              color: "white",
-              fontWeight: "bold",
-              fontSize: "14px",
-            },
-          ]}
+              textAlign: "center", lineHeight: "40px",
+              color: "white", fontWeight: "bold", fontSize: "14px",
+            }]}
+          >
+            {facilities
+              .filter(facility => facility.type === "cleanhouse")
+              .map(facility => (
+                <MapMarker
+                  key={facility.id}
+                  position={{ lat: facility.latitude, lng: facility.longitude }}
+                  image={{
+                    src: "https://t1.daumcdn.net/localimg/localimages/07/2018/pc/img/marker_spot.png",
+                    size: { width: 24, height: 35 },
+                  }}
+                  onClick={() => setSelectedFacility(facility)}
+                />
+              ))}
+          </MarkerClusterer>
+        )}
 
-        >
-          {facilities.map((facility) => (
-            <MapMarker
-              key={facility.id}
-              position={{ lat: facility.latitude, lng: facility.longitude }}
-              image={getMarkerImage(facility.type)}
-              onClick={() => setSelectedFacility(facility)}/>
-          ))}
-        </MarkerClusterer>
+        {/* 재활용센터 마커 클러스터링 */}
+        {showRecycling && (
+          <MarkerClusterer
+            averageCenter
+            minLevel={5}
+            styles={[{
+              width: "40px", height: "40px",
+              background: "rgba(255, 194, 0, 0.7)", // 연한 노랑
+              borderRadius: "50%",
+              textAlign: "center", lineHeight: "40px",
+              color: "white", fontWeight: "bold", fontSize: "14px",
+            }]}
+          >
+            {facilities
+              .filter(facility => facility.type === "recycling")
+              .map(facility => (
+                <MapMarker
+                  key={facility.id}
+                  position={{ lat: facility.latitude, lng: facility.longitude }}
+                  image={{
+                    src: "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
+                    size: { width: 24, height: 35 },
+                  }}
+                  onClick={() => setSelectedFacility(facility)}
+                />
+              ))}
+          </MarkerClusterer>
+        )}
+
+        {/* 배출 요청 마커 클러스터링 */}
+        {showPickupRequests && Object.keys(groupedPickupRequests).length > 0 && (
+          <MarkerClusterer
+            averageCenter
+            minLevel={5}
+            styles={[{
+              width: "40px", height: "40px",
+              background: "rgba(255, 61, 0, 0.7)", // 연한 빨강
+              borderRadius: "50%",
+              textAlign: "center", lineHeight: "40px",
+              color: "white", fontWeight: "bold", fontSize: "14px",
+            }]}
+          >
+            {Object.keys(groupedPickupRequests).map((key) => {
+              const requestsAtSameLocation = groupedPickupRequests[key]; // 해당 좌표의 요청들
+              const firstRequest = requestsAtSameLocation[0]; // 대표 요청만 사용
+              return (
+                <MapMarker
+                  key={key}
+                  position={{ lat: firstRequest.latitude, lng: firstRequest.longitude }}
+                  image={{
+                    src: "/images/marker-red.png",
+                    size: { width: 24, height: 35 },
+                  }}
+                  onClick={() => handleRequestMarkerClick(firstRequest.latitude, firstRequest.longitude)}
+                />
+              );
+            })}
+          </MarkerClusterer>
+        )}
 
         {/* 현재 위치 마커 */}
         {currentPosition && (
@@ -437,21 +498,6 @@ const handleDistrictSelect = (district) => {
           </CustomOverlayMap>
         )}
 
-        {/* 배출 대행 요청 마커 */}
-        {showPickupRequests &&
-            Object.values(groupedPickupRequests).map((group) => (
-                <MapMarker
-                    key={`${group[0].latitude}-${group[0].longitude}`}
-                    position={{ lat: group[0].latitude, lng: group[0].longitude }}
-                    image={{
-                        src: "/images/marker-red.png",  // 배출 요청 마커 아이콘
-                        size: { width: 24, height: 35 },
-                    }}
-                    onClick={() => handleRequestMarkerClick(group[0].latitude, group[0].longitude)}
-                />
-            ))
-        }
-
       </Map>
       {/* 필터 & 현재 위치 버튼 컨테이너 */}
       <div className="absolute bottom-4 right-4 flex flex-col items-end space-y-3 z-10">
@@ -459,6 +505,7 @@ const handleDistrictSelect = (district) => {
         {filterButtons.map((btn, index) => (
           <button
             key={index}
+            title={btn.name}
             onClick={() => {
               btn.toggle();
               handleBoundsChanged(mapRef.current);
@@ -473,6 +520,7 @@ const handleDistrictSelect = (district) => {
 
         {/* 현재 위치 버튼 */}
         <button
+          title="현재 위치"
           className="w-12 h-12 bg-white rounded-full shadow-md flex items-center justify-center"
           onClick={() => currentPosition && setCenter(currentPosition)}
         >
