@@ -1,6 +1,18 @@
 import React from "react";
 import { useNavigate } from "react-router-dom"; // ✅ useNavigate 추가
 
+const trashTypeMapping = {
+  0: "플라스틱",
+  1: "종이류",
+  2: "캔·고철류",
+  3: "스티로폼·비닐류",
+  4: "플라스틱",
+  5: "불에 타는 쓰레기·병류",
+  6: "스티로폼",
+  7: "일반쓰레기",
+  8: "음식물쓰레기",
+};
+
 const RequestModal = ({ requests, onClose }) => {
   const navigate = useNavigate(); // ✅ 네비게이션 훅 사용
 
@@ -30,14 +42,16 @@ const RequestModal = ({ requests, onClose }) => {
           {requests.map((request) => (
             <div key={request.post_id} className="p-3 border-b last:border-none flex justify-between items-center">
               <div className="text-left">
-                <p className="text-sm">🗑️ 쓰레기 종류 : {request.trash_type}</p>
+                <p className="text-sm">
+                  🗑️ 쓰레기 종류 : {trashTypeMapping[Number(request.trash_type)] || "알 수 없음"}
+                </p>
                 <p className="text-sm">📦 쓰레기 총량 : {request.trash_amount} L</p>
                 <p className="text-sm">📍 주소 : {request.address.replace("제주특별자치도 ", "")}</p>
                 <p className="text-sm">💰 수고비 : {request.money.toLocaleString()}원</p>
               </div>
               <button 
                 className="bg-[#FFF3EE] text-[#FF6B6B] text-xs py-1 px-3 rounded-md whitespace-nowrap hover:bg-[#FFE3D5]"
-                onClick={() => handleCardClick(request.post_id)} // ✅ request.id로 이동
+                onClick={() => handleCardClick(request.post_id)}
               >
                 상세 보기
               </button>
