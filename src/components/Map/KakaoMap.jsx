@@ -1,11 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Map, MapMarker, CustomOverlayMap, MarkerClusterer } from "react-kakao-maps-sdk";
-
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import SearchBar from "./SearchBar";
 import Hamburger from '../common/Hamburger';
+import RequestModal from "../request/RequestModal";
 
 const KakaoMap = () => {
+  const navigate = useNavigate();
   const kakaoApiKey = process.env.REACT_APP_KAKAO_MAP_API_KEY;
   const mapRef = useRef(null);
   const [center, setCenter] = useState({ lat: 33.487182768, lng: 126.531717176 });
@@ -23,6 +25,8 @@ const KakaoMap = () => {
   const [showPickupRequests, setShowPickupRequests] = useState(true);  // 배출 대행 요청 보기 여부
 
   const goormSquare = { lat: 33.487182768, lng: 126.531717176 };
+
+  const [modalRequests, setModalRequests] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -263,16 +267,17 @@ const handleRequestMarkerClick = (lat, lng) => {
   const key = `${lat}-${lng}`;
   const requests = groupedPickupRequests[key];
 
-  if (requests.length > 1) {
-      // 같은 위치의 요청이 여러 개 있는 경우
-      setSelectedRequestGroup(requests);
-      setSelectedRequest(null);
-  } else {
-      // 단일 요청일 경우
-      setSelectedRequest(requests[0]);
-      setSelectedRequestGroup(null);
+  if (requests.length > 0) {
+    setModalRequests(requests);  // 요청 개수 관계없이 모달 띄우기
   }
 };
+
+const closeModal = () => {
+  setModalRequests(null);
+};
+
+// {modalRequests && <RequestModal requests={modalRequests} onClose={closeModal} />}
+
 
 // 지도 클릭 시 오버레이 닫기
 const handleMapClick = () => {
@@ -419,6 +424,9 @@ const handleDistrictSelect = (district) => {
                 />
             ))
         }
+
+        {modalRequests && <RequestModal requests={modalRequests} onClose={closeModal} />}
+
       </Map>
 
       {/* 현재 위치로 이동 버튼 */}
