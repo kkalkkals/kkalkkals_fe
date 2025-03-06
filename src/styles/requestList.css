@@ -112,7 +112,7 @@
 
 .request-date {
   font-family: "Dongle", sans-serif;
-  font-size: 18px;
+  font-size: 14px;
   color: #476582;
   padding: 4px 12px;
   background: rgba(220, 237, 247, 0.3);
@@ -130,9 +130,9 @@
 
 .status-badge {
   font-family: "Dongle", sans-serif;
-  font-size: 18px;
+  font-size: 14px;
   padding: 4px 12px;
-  border-radius: 12px;
+  border-radius: 8px;
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -154,10 +154,14 @@
 }
 
 .request-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   font-family: "Dongle", sans-serif;
   font-size: 20px;
   color: #476582;
   margin-bottom: 16px;
+  margin-top: 30px;
   line-height: 1.5;
 }
 
@@ -167,13 +171,33 @@
   border: 1px solid rgba(128, 167, 190, 0.1);
   padding: 14px;
   margin-bottom: 16px;
+  font-size: 15px;
 }
 
 .detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   font-family: "Dongle", sans-serif;
-  font-size: 16px;
-  color: #000000;
+  font-size: 18px;
+  color: #64748b;
   margin-bottom: 8px;
+}
+
+.detail-item .label {
+  font-weight: bold;
+  color: #555;
+  font-size: 16px;
+  min-width: 100px;
+}
+
+.detail-item .value {
+  flex: 1;
+  text-align: left;
+  color: #222;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  font-size: 16px;
 }
 
 .detail-item:last-child {
@@ -190,15 +214,15 @@
 
 .action-buttons {
   display: flex;
-  gap: 12px;
+  margin-top: 10px; /* 버튼과 내용 사이 간격 */
 }
 
 .action-button {
   flex: 1;
-  padding: 12px;
+  padding: 8px;
   border-radius: 12px;
   font-family: "Dongle", sans-serif;
-  font-size: 18px;
+  font-size: 14px;
   cursor: pointer;
   transition: all 0.3s ease;
   border: none;
@@ -206,7 +230,8 @@
 
 .accept-button {
   background: #ffd8a8;
-  color: #476582;
+  color: #ff9500;
+  font-weight: 700;
   box-shadow: 0 4px 12px rgba(255, 216, 168, 0.3);
 }
 
@@ -252,7 +277,7 @@
   background: white;
   color: #476582;
   font-family: "Dongle", sans-serif;
-  font-size: 18px;
+  font-size: 14px;
   border: 1px solid rgba(164, 217, 243, 0.3);
   cursor: pointer;
   transition: all 0.3s ease;
@@ -271,7 +296,7 @@
   border: none;
   border-radius: 12px;
   font-family: "Dongle", sans-serif;
-  font-size: 20px;
+  font-size: 16 px;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
@@ -314,6 +339,7 @@
 .toggle-label {
   cursor: pointer;
   user-select: none;
+  font-size: 14px;
 }
 
 /* 모달 스타일 */

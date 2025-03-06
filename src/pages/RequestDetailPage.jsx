@@ -72,7 +72,7 @@ const RequestDetailPage = () => {
       <Header title="상세 대행" showBack={true} />
       <div className="request-card">
         <div className="request-header">
-          <div className="request-date-detail">{dateFormat(request.date)}</div>
+          <div className="request-date">{dateFormat(request.date)}</div>
           <div className={getStatusBadgeClass(getStatusLabel(request.status))}>
             {getStatusLabel(request.status)}
           </div>
@@ -87,17 +87,33 @@ const RequestDetailPage = () => {
 
         <div className="request-content">
           <div className="detail-item">
-            쓰레기 종류: {getTypeLabel(request.trash_type)}
+            <span className="label">쓰레기 종류</span>
+            <span className="value">{getTypeLabel(request.trash_type)}</span>
           </div>
           <div className="detail-item">
-            쓰레기 총량: {request.trash_amount}L
+            <span className="label">쓰레기 총량</span>
+            <span className="value">{request.trash_amount}L</span>
           </div>
-          <div className="detail-item">수거 위치: {request.address}</div>
-          <div className="detail-item">수고비: {request.money}원</div>
-          <div className="detail-item">수거 요청사항</div>
-          <div className="request-details">
-            <div className="detail-item">{request.request_term}</div>
+          <div className="detail-item">
+            <span className="label">수거 위치</span>
+            <span className="value">{request.address}</span>
           </div>
+          <div className="detail-item">
+            <span className="label">금액</span>
+            <span className="value">
+              {request.money.toLocaleString("ko-KR")}원
+            </span>
+          </div>
+          {request.request_term && (
+            <>
+              <div className="detail-item">
+                <span className="label">수거 요청사항</span>
+              </div>
+              <div className="request-details">
+                <div className="label">{request.request_term}</div>
+              </div>
+            </>
+          )}
         </div>
 
         <div className="action-buttons">
