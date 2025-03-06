@@ -9,12 +9,23 @@ const RequestFormPage = () => {
   const navigate = useNavigate();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  // const [btnColor, setBtnColor] = useState("#8c8c8c");
   const [amountText, setAmountText] = useState(`
     최소 신청량은 10L이며, 10L 이하라도 기본 요금이 적용됩니다.
   `);
   const [amountText2, setAmountText2] = useState(`
     기본 요금: 2,500원, 1L당 초과요금: 200원
   `);
+
+  const isFormValid = () => {
+    return (
+      formData.trashTypes !== 9 &&
+      formData.trashAmount.trim() !== "" &&
+      formData.location.trim() !== "" &&
+      formData.requestDetails.trim() !== "" &&
+      formData.image !== null
+    );
+  };
 
   const [formData, setFormData] = useState({
     trashTypes: 9,
@@ -78,10 +89,7 @@ const RequestFormPage = () => {
     const extraAmount = amountNum - (formData.trashTypes === 8 ? 1 : 10);
     const extraPrice = extraAmount * 200;
 
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      money: basePrice + extraPrice, // money 값을 업데이트
-    }));
+    formData.money = basePrice + extraPrice;
     return basePrice + extraPrice;
   };
 
@@ -258,7 +266,12 @@ const RequestFormPage = () => {
             </span>
           </div>
 
-          <button type="submit" className="submit-button">
+          <button
+            type="submit"
+            className={`submit-button`}
+            style={{ backgroundColor: isFormValid() ? "#38bdf8" : "#8c8c8c" }}
+            disabled={!isFormValid()}
+          >
             요청하기
           </button>
         </div>
@@ -282,6 +295,7 @@ const RequestFormPage = () => {
               </button>
               <button
                 className="modal-button-confirm"
+                // style={{ backgroundColor: btnColor }}
                 onClick={() => {
                   submitRequest();
                   setShowConfirmModal(false);
