@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Map, MapMarker, CustomOverlayMap } from "react-kakao-maps-sdk";
+
 import axios from "axios";
 
 const KakaoMap = () => {
@@ -39,11 +40,30 @@ const KakaoMap = () => {
     }
   }, []);
 
+  // 시설 데이터 (클린하우스, 재활용도움센터 등)
+  const facilityData = [
+    {
+      id: 1,
+      type: "cleanhouse",
+      name: "클린하우스",
+      address: "제주특별자치도 제주시 한림읍 대림리 1298-1",
+      operationHours: "16:00 ~ 04:00",
+      position: { lat: 33.450701, lng: 126.570667 },
+    },
+    {
+      id: 2,
+      type: "recycling",
+      name: "재활용도움센터",
+      address: "제주특별자치도 제주시 한림읍 대림리 1298-1",
+      operationHours: "07:00 ~ 22:00",
+      position: { lat: 33.452564, lng: 126.574041 },
+    },
+  ];
   // 지도 바운더리가 변경될 때 API 요청
   const fetchFacilities = async (bounds) => {
     try {
       const response = await axios.get(
-        `http://localhost:80/api/locations/bounds/?minLat=${bounds.swLat}&maxLat=${bounds.neLat}&minLng=${bounds.swLng}&maxLng=${bounds.neLng}`
+        `http://3.37.88.60/api/locations/bounds/?minLat=${bounds.swLat}&maxLat=${bounds.neLat}&minLng=${bounds.swLng}&maxLng=${bounds.neLng}`
       );
       setFacilities(response.data.data);
     } catch (error) {
