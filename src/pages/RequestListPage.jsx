@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/common/Header";
-import TabMenu from "../components/tabs/TabMenu";
 import Modal from "../components/common/Modal"; // 모달 추가
 import RequestCard from "../components/request/RequestCard"; // RequestCard 적용
 import "../styles/requestList.css";
@@ -35,12 +34,17 @@ const RequestListPage = () => {
         const formattedRequests = data.data.map((post) => ({
           id: post.post_id,
           date: new Date(post.date).toISOString().split("T")[0], // 날짜 변환
-          status: post.status === 0 ? "요청중" : post.status === 1 ? "수거중" : "완료됨",
+          status:
+            post.status === 0
+              ? "요청중"
+              : post.status === 1
+                ? "수거중"
+                : "완료됨",
           trashType: post.trash_type,
           trashAmount: `${post.trash_amount}L`,
           location: post.address,
           requestDetails: post.request_term || "요청사항 없음",
-          image: post.image,
+          image: "http://3.37.88.60/" + post.image,
         }));
 
         setRequests(formattedRequests);
@@ -57,8 +61,8 @@ const RequestListPage = () => {
     let filtered = [...requests];
 
     if (!showCompleted) {
-      filtered = filtered.filter(request =>
-        request.status !== "완료됨" && request.status !== "취소됨"
+      filtered = filtered.filter(
+        (request) => request.status !== "완료됨" && request.status !== "취소됨"
       );
     }
 
@@ -147,14 +151,17 @@ const RequestListPage = () => {
         </button>
 
         <div className="show-completed-toggle flex items-center">
-          <input 
-            type="checkbox" 
-            id="show-completed" 
+          <input
+            type="checkbox"
+            id="show-completed"
             className="toggle-checkbox"
             checked={showCompleted}
             onChange={(e) => setShowCompleted(e.target.checked)}
           />
-          <label htmlFor="show-completed" className="ml-2 text-sm text-gray-600">
+          <label
+            htmlFor="show-completed"
+            className="ml-2 text-sm text-gray-600"
+          >
             배출 완료된 건 보기
           </label>
         </div>
@@ -162,7 +169,7 @@ const RequestListPage = () => {
 
       {/* 요청 목록 */}
       <div className="list-content mt-4">
-        {filteredRequests().map(request => (
+        {filteredRequests().map((request) => (
           <RequestCard
             key={request.id}
             request={request}
@@ -196,7 +203,7 @@ const RequestListPage = () => {
         variant="primary"
       />
 
-      <TabMenu activeTab="request-list" />
+      {/* <TabMenu activeTab="request-list" /> */}
     </div>
   );
 };

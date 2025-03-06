@@ -24,6 +24,11 @@
   color: #6b7280;
   margin-bottom: 0.5rem;
 }
+.section-description2 {
+  font-size: 0.875rem;
+  color: #6b7280;
+  /* margin-bottom: 0.5rem; */
+}
 
 /* 쓰레기 종류 그리드 */
 .trash-types-grid {
@@ -63,12 +68,21 @@
   padding: 0.75rem;
 }
 
+.form-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+.form-input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+
 .form-textarea {
   width: 100%;
   border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
   padding: 0.75rem;
   height: 6rem;
+  resize: none;
 }
 
 .character-count {
@@ -133,7 +147,7 @@
 .submit-button {
   width: 100%;
   padding: 0.75rem;
-  background-color: #38bdf8;
+  background-color: #868a8c;
   color: white;
   border: none;
   border-radius: 0.375rem;
