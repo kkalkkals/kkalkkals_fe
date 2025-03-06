@@ -1,0 +1,88 @@
+/* RequestDetailPage.css */
+
+.detail-container {
+  min-height: 100vh;
+  background-color: #f3f4f6;
+}
+
+.loading-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.request-details {
+  padding: 1rem;
+  background-color: white;
+  margin-bottom: 1rem;
+}
+
+.request-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.date-badge {
+  background-color: black;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+}
+
+.status-pending {
+  background-color: #6366f1;
+  color: white;
+}
+
+.status-inprogress {
+  background-color: #22c55e;
+  color: white;
+}
+
+.status-completed {
+  background-color: #9ca3af;
+  color: white;
+}
+
+.request-content {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 1rem;
+}
+
+.info-item {
+  margin-bottom: 0.5rem;
+}
+
+.info-label {
+  font-weight: bold;
+}
+
+.image-container {
+  margin-top: 1rem;
+}
+
+.image-title {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.request-image {
+  width: 100%;
+  height: 10rem;
+  background-color: #e5e7eb;
+  border-radius: 0.25rem;
+}
+
+.action-container {
+  padding: 1rem;
+}

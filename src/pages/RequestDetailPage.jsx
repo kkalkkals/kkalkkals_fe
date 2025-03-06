@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../components/common/Header';
 import Button from '../components/common/Button';
 import Modal from '../components/common/Modal';
+import './RequestDetailPage.css';
 
 const RequestDetailPage = () => {
   const { id } = useParams();
@@ -56,60 +57,60 @@ const RequestDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="loading-container">
         <p>로딩 중...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="detail-container">
       <Header title="요청 상세" />
 
-      <div className="p-4 bg-white mb-4">
-        <div className="flex justify-between items-center mb-4">
-          <div className="bg-black text-white py-1 px-2 rounded text-sm">
+      <div className="request-details">
+        <div className="request-header">
+          <div className="date-badge">
             {request.date}
           </div>
           <div
-            className={`py-1 px-3 rounded-full text-sm ${
+            className={`status-badge ${
               request.status === '요청중'
-                ? 'bg-indigo-500 text-white'
+                ? 'status-pending'
                 : request.status === '수거중'
-                ? 'bg-green-500 text-white'
-                : 'bg-gray-400 text-white'
+                ? 'status-inprogress'
+                : 'status-completed'
             }`}
           >
             {request.status}
           </div>
         </div>
 
-        <div className="border-t pt-4">
-          <p className="mb-2">
-            <span className="font-bold">쓰레기 종류:</span> {request.trashType}
+        <div className="request-content">
+          <p className="info-item">
+            <span className="info-label">쓰레기 종류:</span> {request.trashType}
           </p>
-          <p className="mb-2">
-            <span className="font-bold">쓰레기 총량(L):</span>{' '}
+          <p className="info-item">
+            <span className="info-label">쓰레기 총량(L):</span>{' '}
             {request.trashAmount}
           </p>
-          <p className="mb-2">
-            <span className="font-bold">수거 위치:</span> {request.location}
+          <p className="info-item">
+            <span className="info-label">수거 위치:</span> {request.location}
           </p>
-          <p className="mb-2">
-            <span className="font-bold">수거 요청사항:</span>{' '}
+          <p className="info-item">
+            <span className="info-label">수거 요청사항:</span>{' '}
             {request.requestDetails}
           </p>
         </div>
 
         {request.image && (
-          <div className="mt-4">
-            <h3 className="font-bold mb-2">첨부 이미지</h3>
-            <div className="w-full h-40 bg-gray-200 rounded"></div>
+          <div className="image-container">
+            <h3 className="image-title">첨부 이미지</h3>
+            <div className="request-image"></div>
           </div>
         )}
       </div>
 
-      <div className="p-4">
+      <div className="action-container">
         {request.status === '요청중' && (
           <Button onClick={handleAccept}>수락하기</Button>
         )}
