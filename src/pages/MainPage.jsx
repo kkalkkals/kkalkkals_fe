@@ -1,20 +1,51 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import KakaoMap from '../components/Map/KakaoMap';
 import SearchBar from '../components/Map/SearchBar';
-import Menu from '../components/common/Menu';
 import '../styles/main.css';
 
 const MainPage = () => {
+  const navigate = useNavigate();
   const [searchKeyword, setSearchKeyword] = useState('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   
   return (
     <div className="main-container">
-      <div className="search-container">
+      <div className="search-container relative">
         <SearchBar onSearch={setSearchKeyword} />
-        <Menu />
+        <div className="absolute right-4 top-3">
+          <button
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            className="text-gray-700 text-2xl"
+          >
+            ☰
+          </button>
+          {isDropdownOpen && (
+            <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg overflow-hidden z-50">
+              <button
+                onClick={() => {
+                  navigate('/request-list');
+                  setIsDropdownOpen(false);
+                }}
+                className="w-full px-4 py-3 text-left hover:bg-gray-50"
+              >
+                <span className="text-gray-700">배출 대행</span>
+              </button>
+              <button
+                onClick={() => {
+                  navigate('/guide');
+                  setIsDropdownOpen(false);
+                }}
+                className="w-full px-4 py-3 text-left hover:bg-gray-50 border-t border-gray-100"
+              >
+                <span className="text-gray-700">클린하우스란?</span>
+              </button>
+            </div>
+          )}
+        </div>
       </div>
       <div className="map-container">
-        <KakaoMap />
+        <KakaoMap searchKeyword={searchKeyword} />
       </div>
     </div>
   );

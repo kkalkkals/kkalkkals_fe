@@ -8,6 +8,7 @@ import '../styles/requestForm.css';
 const RequestFormPage = () => {
   const navigate = useNavigate();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [formData, setFormData] = useState({
     trashTypes: [],
     trashAmount: '10',
@@ -87,7 +88,43 @@ const RequestFormPage = () => {
 
   return (
     <div className="form-container">
-      <Header title="대행 요청하기" />
+      <div className="relative">
+        <Header 
+          title="대행 요청하기" 
+          showBack={true}
+          showMenu={false}
+        />
+        <div className="absolute right-4 top-3">
+          <button
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            className="text-white text-2xl"
+          >
+            ☰
+          </button>
+          {isDropdownOpen && (
+            <div className="absolute right-0 top-full mt-1 w-32 bg-white rounded-lg shadow-lg overflow-hidden z-50">
+              <button
+                onClick={() => {
+                  navigate('/');
+                  setIsDropdownOpen(false);
+                }}
+                className="w-full px-4 py-3 text-left hover:bg-gray-50"
+              >
+                <span className="text-gray-700">지도</span>
+              </button>
+              <button
+                onClick={() => {
+                  navigate('/guide');
+                  setIsDropdownOpen(false);
+                }}
+                className="w-full px-4 py-3 text-left hover:bg-gray-50 border-t border-gray-100"
+              >
+                <span className="text-gray-700">클린하우스란?</span>
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
       
       <form onSubmit={handleSubmit} className="form-content">
         <div className="form-section">
