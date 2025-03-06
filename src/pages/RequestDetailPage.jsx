@@ -1,145 +1,184 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import Header from '../components/common/Header';
-import Button from '../components/common/Button';
-import Modal from '../components/common/Modal';
 import '../styles/requestDetail.css';
 
 const RequestDetailPage = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [request, setRequest] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [showAcceptModal, setShowAcceptModal] = useState(false);
-  const [showCompleteModal, setShowCompleteModal] = useState(false);
+  const [charCount, setCharCount] = useState(0);
 
   useEffect(() => {
-    // API 요청으로 데이터 가져오기 (임시 데이터 사용)
-    const fetchRequest = async () => {
-      // 실제로는 API 호출
-      setRequest({
-        id,
-        date: '2025-03-06',
-        status: '요청중',
-        trashType: '일반쓰레기, 유리류',
-        trashAmount: '20L',
-        location: '제주시 구남동 1길 12',
-        requestDetails: '유리 수거 하실 때 조심하세요!',
-        image: null,
-      });
-      setLoading(false);
+    // API에서 요청 상세 정보를 가져오는 로직
+    const fetchRequestDetail = async () => {
+      try {
+        const response = await fetch(`http://3.37.88.60:80/posts/${id}`);
+        const data = await response.json();
+        setRequest(data.data);
+      } catch (error) {
+        console.error('Error fetching request details:', error);
+      }
     };
 
-    fetchRequest();
+    fetchRequestDetail();
   }, [id]);
 
-  const handleAccept = () => {
-    setShowAcceptModal(true);
-  };
-
-  const confirmAccept = () => {
-    // API 요청 - 수락 처리
-    console.log('요청 수락');
-    setRequest((prev) => ({ ...prev, status: '수거중' }));
-    navigate('/request-list');
-  };
-
-  const handleComplete = () => {
-    setShowCompleteModal(true);
-  };
-
-  const confirmComplete = () => {
-    // API 요청 - 완료 처리
-    console.log('대행 완료');
-    setRequest((prev) => ({ ...prev, status: '완료됨' }));
-    navigate('/request-list');
-  };
-
-  if (loading) {
+  if (!request) {
     return (
-      <div className="loading-container">
-        <p>로딩 중...</p>
+      <div className="detail-container">
+        <Header title="대행 요청하기" showBack={true} />
+        <div className="detail-content">
+          <div>로딩중...</div>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="detail-container">
-      <Header title="요청 상세" />
-
-      <div className="request-details">
-        <div className="request-header">
-          <div className="date-badge">
-            {request.date}
+      <Header title="대행 요청하기" showBack={true} />
+      
+      <div className="detail-content">
+        {/* 쓰레기 종류 섹션 */}
+        <h2 className="section-title">쓰레기 종류</h2>
+        <div className="trash-type-grid">
+          <div className="trash-type-item">
+            <input
+              type="checkbox"
+              className="trash-type-checkbox"
+              checked={request.trash_type?.includes('왕: 플라스틱류')}
+              readOnly
+            />
+            <span className="trash-type-label">왕: 플라스틱류</span>
           </div>
-          <div
-            className={`status-badge ${
-              request.status === '요청중'
-                ? 'status-pending'
-                : request.status === '수거중'
-                ? 'status-inprogress'
-                : 'status-completed'
-            }`}
-          >
-            {request.status}
+          <div className="trash-type-item">
+            <input
+              type="checkbox"
+              className="trash-type-checkbox"
+              checked={request.trash_type?.includes('토: 물에 안타는')}
+              readOnly
+            />
+            <span className="trash-type-label">토: 물에 안타는<br />쓰레기/병류</span>
+          </div>
+          <div className="trash-type-item">
+            <input
+              type="checkbox"
+              className="trash-type-checkbox"
+              checked={request.trash_type?.includes('화: 종이류')}
+              readOnly
+            />
+            <span className="trash-type-label">화: 종이류</span>
+          </div>
+          <div className="trash-type-item">
+            <input
+              type="checkbox"
+              className="trash-type-checkbox"
+              checked={request.trash_type?.includes('수: 캔/고철류')}
+              readOnly
+            />
+            <span className="trash-type-label">수: 캔/고철류</span>
+          </div>
+          <div className="trash-type-item">
+            <input
+              type="checkbox"
+              className="trash-type-checkbox"
+              checked={request.trash_type?.includes('목: 스티로폼/비닐류')}
+              readOnly
+            />
+            <span className="trash-type-label">목: 스티로폼/비닐류</span>
+          </div>
+          <div className="trash-type-item">
+            <input
+              type="checkbox"
+              className="trash-type-checkbox"
+              checked={request.trash_type?.includes('금: 플라스틱류')}
+              readOnly
+            />
+            <span className="trash-type-label">금: 플라스틱류</span>
+          </div>
+          <div className="trash-type-item">
+            <input
+              type="checkbox"
+              className="trash-type-checkbox"
+              checked={request.trash_type?.includes('일반쓰레기')}
+              readOnly
+            />
+            <span className="trash-type-label">일반쓰레기</span>
+          </div>
+          <div className="trash-type-item">
+            <input
+              type="checkbox"
+              className="trash-type-checkbox"
+              checked={request.trash_type?.includes('음식물쓰레기')}
+              readOnly
+            />
+            <span className="trash-type-label">음식물쓰레기</span>
           </div>
         </div>
 
-        <div className="request-content">
-          <p className="info-item">
-            <span className="info-label">쓰레기 종류:</span> {request.trashType}
-          </p>
-          <p className="info-item">
-            <span className="info-label">쓰레기 총량(L):</span>{' '}
-            {request.trashAmount}
-          </p>
-          <p className="info-item">
-            <span className="info-label">수거 위치:</span> {request.location}
-          </p>
-          <p className="info-item">
-            <span className="info-label">수거 요청사항:</span>{' '}
-            {request.requestDetails}
-          </p>
+        {/* 쓰레기 양 섹션 */}
+        <h2 className="section-title">쓰레기 종량(L)</h2>
+        <p className="amount-info">
+          10L 까지 기본 요금이며, 이후 1L 당 추가 요금이 발생합니다.<br />
+          기본 요금: 2,500원, 1L당 추가 요금: 200원
+        </p>
+        <input
+          type="text"
+          className="amount-input"
+          placeholder="숫자만 입력해주세요"
+          value={request.trash_amount}
+          readOnly
+        />
+
+        {/* 수거 요청 주소 섹션 */}
+        <h2 className="section-title">수거 요청 주소</h2>
+        <input
+          type="text"
+          className="location-input"
+          placeholder="도로명 주소로 입력해주세요"
+          value={request.address}
+          readOnly
+        />
+
+        {/* 수거자에게 전할 말 섹션 */}
+        <h2 className="section-title">수거자에게 전할 말</h2>
+        <textarea
+          className="message-input"
+          placeholder="주의사항을 적어주세요"
+          value={request.request_term}
+          readOnly
+          maxLength={20}
+          onChange={(e) => setCharCount(e.target.value.length)}
+        />
+        <div className="character-count">{charCount}/20</div>
+
+        {/* 사진 첨부 섹션 */}
+        <h2 className="section-title">쓰레기 사진 첨부</h2>
+        <h3 className="section-subtitle">사진 첨부</h3>
+        <div className="image-preview">
+          {request.image ? (
+            <img
+              src={`http://3.37.88.60/${request.image}`}
+              alt="쓰레기 사진"
+              className="preview-image"
+            />
+          ) : (
+            <div className="image-placeholder">
+              사진 첨부
+            </div>
+          )}
         </div>
 
-        {request.image && (
-          <div className="image-container">
-            <h3 className="image-title">첨부 이미지</h3>
-            <div className="request-image"></div>
-          </div>
-        )}
+        {/* 총 금액 */}
+        <div className="total-price">
+          총액: {request.price || 5000}원
+        </div>
+
+        {/* 요청하기 버튼 */}
+        <button className="submit-button">
+          요청하기
+        </button>
       </div>
-
-      <div className="action-container">
-        {request.status === '요청중' && (
-          <Button onClick={handleAccept}>수락하기</Button>
-        )}
-        {request.status === '수거중' && (
-          <Button onClick={handleComplete}>대행완료</Button>
-        )}
-      </div>
-
-      {/* 수락 확인 모달 */}
-      <Modal
-        isOpen={showAcceptModal}
-        onClose={() => setShowAcceptModal(false)}
-        title="요청을 수락하시겠습니까?"
-        message="수락 후, 2번이상 수거 하지 않을 시 이용이 제한됩니다."
-        confirmText="수락"
-        cancelText="취소"
-        onConfirm={confirmAccept}
-      />
-
-      {/* 완료 확인 모달 */}
-      <Modal
-        isOpen={showCompleteModal}
-        onClose={() => setShowCompleteModal(false)}
-        title="쓰레기 배출이 완료되었나요?"
-        message="환경을 위한 한 걸음! 당신의 한 걸음이 제주를 깨끗하게 만들었어요!"
-        confirmText="네"
-        cancelText="아니오"
-        onConfirm={confirmComplete}
-      />
     </div>
   );
 };
