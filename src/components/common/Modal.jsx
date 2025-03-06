@@ -29,7 +29,7 @@ const Modal = ({
                 <h3 className="text-center text-md font-bold leading-6 text-gray-900 mb-4 truncate">
                   {title}
                 </h3>
-                <div className="text-center text-sm mt-2 mx-auto max-w-7/10 px-6 truncate">
+                <div className="text-center text-sm mt-2 mx-auto max-w-7/10 px-6">
                   {children}
                 </div>
               </div>
