@@ -1,13 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Map, MapMarker, CustomOverlayMap, MarkerClusterer } from "react-kakao-maps-sdk";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import SearchBar from "./SearchBar";
 import Hamburger from '../common/Hamburger';
 import RequestModal from "../request/RequestModal";
 
 const KakaoMap = () => {
-  const navigate = useNavigate();
   const kakaoApiKey = process.env.REACT_APP_KAKAO_MAP_API_KEY;
   const mapRef = useRef(null);
   const [center, setCenter] = useState({ lat: 33.487182768, lng: 126.531717176 });
@@ -18,11 +16,16 @@ const KakaoMap = () => {
   const [facilities, setFacilities] = useState([]); // 마커 데이터
   const [pickupRequests, setPickupRequests] = useState([]); // 배출 대행 요청 데이터 추가
 
+    // 필터 상태
+  const [showCleanhouse, setShowCleanhouse] = useState(true);
+  const [showRecycling, setShowRecycling] = useState(true);
+  const [showPickupRequests, setShowPickupRequests] = useState(true);
+
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [selectedRequestGroup, setSelectedRequestGroup] = useState(null); // 같은 위치 요청 그룹
   
   const [showFacilities, setShowFacilities] = useState(true);  // 클린하우스, 재활용센터 보기 여부
-  const [showPickupRequests, setShowPickupRequests] = useState(true);  // 배출 대행 요청 보기 여부
+  // const [showPickupRequests, setShowPickupRequests] = useState(true);  // 배출 대행 요청 보기 여부
 
   const goormSquare = { lat: 33.487182768, lng: 126.531717176 };
 
@@ -31,6 +34,29 @@ const KakaoMap = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
+
+
+  // 필터 버튼 이미지
+  const filterButtons = [
+    {
+      name: "클린하우스",
+      state: showCleanhouse,
+      toggle: () => setShowCleanhouse((prev) => !prev),
+      img: "https://t1.daumcdn.net/localimg/localimages/07/2018/pc/img/marker_spot.png",
+    },
+    {
+      name: "재활용센터",
+      state: showRecycling,
+      toggle: () => setShowRecycling((prev) => !prev),
+      img: "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
+    },
+    {
+      name: "대행 요청",
+      state: showPickupRequests,
+      toggle: () => setShowPickupRequests((prev) => !prev),
+      img: "/images/marker-red.png",
+    },
+  ];
   
   // 제주도 읍면동 데이터
   const jejuDistricts = [
@@ -425,36 +451,39 @@ const handleDistrictSelect = (district) => {
             ))
         }
 
-        {modalRequests && <RequestModal requests={modalRequests} onClose={closeModal} />}
-
       </Map>
+      {/* 필터 & 현재 위치 버튼 컨테이너 */}
+      <div className="absolute bottom-4 right-4 flex flex-col items-end space-y-3 z-10">
+        {/* 필터 버튼들 */}
+        {filterButtons.map((btn, index) => (
+          <button
+            key={index}
+            onClick={() => {
+              btn.toggle();
+              handleBoundsChanged(mapRef.current);
+            }}
+            className={`w-12 h-12 flex items-center justify-center rounded-full shadow-md transition ${
+              btn.state ? "bg-white" : "bg-gray-300 opacity-50"
+            }`}
+          >
+            <img src={btn.img} alt={btn.name} className="w-6 h-6" />
+          </button>
+        ))}
 
-      {/* 현재 위치로 이동 버튼 */}
-      <button
-        className="absolute bottom-24 right-4 w-12 h-12 bg-white rounded-full shadow-md flex items-center justify-center z-10"
-        onClick={moveToGoormSquare}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6 text-gray-600"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
+        {/* 현재 위치 버튼 */}
+        <button
+          className="w-12 h-12 bg-white rounded-full shadow-md flex items-center justify-center"
+          onClick={() => currentPosition && setCenter(currentPosition)}
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-          />
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-          />
-        </svg>
-      </button>
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </button>
+      </div>
+
+      {/* 배출 요청 모달 */}
+      {modalRequests && <RequestModal requests={modalRequests} onClose={closeModal} />}
     </div>
   );
 };
