@@ -1,0 +1,127 @@
+.onboarding-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* width: 390px; */
+    height: 852px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
+    padding: 20px;
+    text-align: center;
+    position: relative;
+}
+/* 
+.onboarding-slide {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+
+} */
+.onboarding-slides {
+    display: flex;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.onboarding-slide-wrapper {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    width: 100%; /* ✅ 고정 */
+}
+
+.onboarding-slide {
+    min-width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* ✅ 가로 정렬 중앙 */
+    align-items: center; /* ✅ 세로 정렬 중앙 */
+    text-align: center;
+    height: 100%;
+}
+
+
+.onboarding-image {
+    width: 200px;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+.onboarding-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.onboarding-description {
+    font-size: 16px;
+    color: #666;
+    line-height: 1.4;
+    white-space: pre-line;
+}
+
+/* 🔵 슬라이드 인디케이터 스타일 */
+.onboarding-indicators {
+    position: absolute;
+    bottom: 150px; /* 하단 버튼(20px) + 여백(30px) + 추가 마진(10px) */
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+}
+
+.indicator {
+    width: 10px;
+    height: 10px;
+    margin: 0 5px;
+    border-radius: 50%;
+    background: #ccc;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.indicator.active {
+    background: #007bff;
+    width: 12px;
+    height: 12px;
+}
+
+/* 좌우 이동 버튼 */
+.onboarding-controls {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    transform: translateY(-50%);
+}
+
+.arrow {
+    background: none;
+    border: none;
+    color: #007bff;
+    font-size: 35px;
+    cursor: pointer;
+    padding: 20px;
+}
+
+/* 하단 버튼 고정 */
+.onboarding-button {
+    width: 100%;
+    max-width: 350px;
+    position: absolute;
+    bottom: 20px;
+    background: #007bff;
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
