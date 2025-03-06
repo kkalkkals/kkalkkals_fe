@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Map, MapMarker, CustomOverlayMap } from 'react-kakao-maps-sdk';
+import React, { useEffect, useState } from "react";
+import { Map, MapMarker, CustomOverlayMap } from "react-kakao-maps-sdk";
 
 // kakao 객체를 window에서 가져오기
 const { kakao } = window;
@@ -14,18 +14,18 @@ const KakaoMap = () => {
   const facilityData = [
     {
       id: 1,
-      type: 'cleanhouse',
-      name: '클린하우스',
-      address: '제주특별자치도 제주시 한림읍 대림리 1298-1',
-      operationHours: '16:00 ~ 04:00',
+      type: "cleanhouse",
+      name: "클린하우스",
+      address: "제주특별자치도 제주시 한림읍 대림리 1298-1",
+      operationHours: "16:00 ~ 04:00",
       position: { lat: 33.450701, lng: 126.570667 },
     },
     {
       id: 2,
-      type: 'recycling',
-      name: '재활용도움센터',
-      address: '제주특별자치도 제주시 한림읍 대림리 1298-1',
-      operationHours: '07:00 ~ 22:00',
+      type: "recycling",
+      name: "재활용도움센터",
+      address: "제주특별자치도 제주시 한림읍 대림리 1298-1",
+      operationHours: "07:00 ~ 22:00",
       position: { lat: 33.452564, lng: 126.574041 },
     },
   ];
@@ -40,7 +40,7 @@ const KakaoMap = () => {
           setCenter({ lat: latitude, lng: longitude });
         },
         (error) => {
-          console.error('Error getting current position:', error);
+          console.error("Error getting current position:", error);
         }
       );
     }
@@ -49,45 +49,45 @@ const KakaoMap = () => {
   // 지도 초기화 시 크기 설정 부분
   useEffect(() => {
     if (!kakao) {
-      console.error('Kakao maps SDK not loaded');
+      console.error("Kakao maps SDK not loaded");
       return;
     }
-    
-    const container = document.getElementById('map');
+
+    const container = document.getElementById("map");
     const options = {
       center: new kakao.maps.LatLng(37.566826, 126.9786567),
-      level: 3
+      level: 3,
     };
-    
+
     // 지도 생성 후 크기 재설정
     const map = new kakao.maps.Map(container, options);
-    
+
     // 지도 크기를 컨테이너에 맞게 조정
     const resizeMap = () => {
-      const mapContainer = document.getElementById('map');
+      const mapContainer = document.getElementById("map");
       const parentWidth = mapContainer.parentElement.clientWidth;
-      mapContainer.style.width = parentWidth + 'px';
+      mapContainer.style.width = parentWidth + "px";
       map.relayout(); // 지도 레이아웃 재설정
     };
-    
+
     // 초기 로드 및 리사이즈 시 지도 크기 조정
     resizeMap();
-    window.addEventListener('resize', resizeMap);
-    
-    return () => window.removeEventListener('resize', resizeMap);
+    window.addEventListener("resize", resizeMap);
+
+    return () => window.removeEventListener("resize", resizeMap);
   }, []);
 
   // 마커 아이콘 설정
   const getMarkerImage = (type) => {
     switch (type) {
-      case 'cleanhouse':
+      case "cleanhouse":
         return {
-          src: 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png',
+          src: "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
           size: { width: 24, height: 35 },
         };
-      case 'recycling':
+      case "recycling":
         return {
-          src: 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png',
+          src: "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
           size: { width: 24, height: 35 },
         };
       default:
@@ -97,19 +97,19 @@ const KakaoMap = () => {
 
   return (
     <div className="w-full h-full">
-      <div 
-        id="map" 
-        style={{ 
-          width: '100%',       // 부모 요소의 너비에 맞춤
-          height: '100vh',     // 높이는 유지
-          position: 'relative',
-          overflow: 'hidden'   // 넘치는 부분 숨김
+      <div
+        id="map"
+        style={{
+          width: "100%", // 부모 요소의 너비에 맞춤
+          height: "100vh", // 높이는 유지
+          position: "relative",
+          overflow: "hidden", // 넘치는 부분 숨김
         }}
       ></div>
       <Map
         center={center}
         level={level}
-        style={{ width: '100%', height: '100%' }}
+        style={{ width: "100%", height: "100%" }}
         onZoomChanged={(map) => setLevel(map.getLevel())}
       >
         {/* 시설 마커 */}
