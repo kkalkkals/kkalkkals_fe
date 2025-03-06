@@ -18,48 +18,24 @@ const RequestCard = ({ request, onAccept, onComplete }) => {
         </div>
       </div>
       
+
       <div className="request-content">
-        <div className="detail-item">쓰레기 종류: {request.trashType}</div>
-        <div className="detail-item">쓰레기 총량: {request.trashAmount}</div>
-        <div className="detail-item">수거 위치: {request.location}</div>
-      </div>
-
-      <div className="request-details">
-        <div className="detail-item">수거 요청사항</div>
-        <div className="detail-item">{request.requestDetails}</div>
-      </div>
-
-      {request.image && (
-        <img 
-          src={request.image} 
-          alt="쓰레기 이미지" 
-          className="request-image"
-        />
-      )}
-
-      <div className="action-buttons">
-        {request.status === "요청중" && (
-          <button 
-            className="action-button accept-button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onAccept(request.id);
-            }}
-          >
-            수락하기
-          </button>
-        )}
-        {request.status === "수거중" && (
-          <button 
-            className="action-button complete-button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onComplete(request.id);
-            }}
-          >
-            대행완료
-          </button>
-        )}
+        <div className="detail-item">
+          <span className="label">쓰레기 종류</span>
+          <span className="value">{request.trashType}</span>
+        </div>
+        <div className="detail-item">
+          <span className="label">쓰레기 총량</span>
+          <span className="value">{request.trashAmount}</span>
+        </div>
+        <div className="detail-item">
+          <span className="label">수거 위치</span>
+          <span className="value">{request.location}</span>
+        </div>
+        <div className="detail-item">
+          <span className="label">금액</span>
+          <span className="value">{request.money.toLocaleString("ko-KR")}원</span>
+        </div>
       </div>
     </div>
   );

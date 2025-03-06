@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../components/common/Header";
 import Modal from "../components/common/Modal"; // 모달 추가
 import RequestCard from "../components/request/RequestCard"; // RequestCard 적용
 import "../styles/requestList.css";
 import axios from "axios";
 
-const API_URL = "http://3.37.88.60:80/posts/all"; // 백엔드 API 주소
+const API_URL = "http://3.37.88.60/posts/all"; // 백엔드 API 주소
 
 const RequestListPage = () => {
+  const navigate = useNavigate();
   const [requests, setRequests] = useState([]);
   const [filter, setFilter] = useState("최신순");
   const [showCompleted, setShowCompleted] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // 모달 상태 추가
   const [isAcceptModalOpen, setIsAcceptModalOpen] = useState(false);
@@ -47,6 +48,7 @@ const RequestListPage = () => {
         location: post.address,
         requestDetails: post.request_term || "요청사항 없음",
         image: "http://3.37.88.60/" + post.image,
+        money: post.money,
       }));
 
       setRequests(formattedRequests);
@@ -132,18 +134,20 @@ const RequestListPage = () => {
       <div className="list-content">
         <div className="filter-bar">
           <button
-            // onClick={() => navigate('/request-form')}
+            onClick={() => navigate("/request-form")}
             className="create-request-button"
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
             </svg>
             배출대행 신청하기
           </button>
 
           <div className="filter-row">
             <button
-              onClick={() => setFilter(filter === "최신순" ? "오래된순" : "최신순")}
+              onClick={() =>
+                setFilter(filter === "최신순" ? "오래된순" : "최신순")
+              }
               className="filter-button"
             >
               {filter} ⬇
@@ -157,10 +161,7 @@ const RequestListPage = () => {
                 checked={showCompleted}
                 onChange={(e) => setShowCompleted(e.target.checked)}
               />
-              <label
-                htmlFor="show-completed"
-                className="toggle-label"
-              >
+              <label htmlFor="show-completed" className="toggle-label">
                 배출 완료된 건 보기
               </label>
             </div>

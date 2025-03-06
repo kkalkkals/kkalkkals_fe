@@ -8,26 +8,66 @@ import axios from "axios";
 const RequestFormPage = () => {
   const navigate = useNavigate();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  // const [btnColor, setBtnColor] = useState("#8c8c8c");
+  const [amountText, setAmountText] = useState(`
+    최소 신청량은 10L이며, 10L 이하라도 기본 요금이 적용됩니다.
+  `);
+  const [amountText2, setAmountText2] = useState(`
+    기본 요금: 2,500원, 1L당 초과요금: 200원
+  `);
   const [charCount, setCharCount] = useState(0);
   const [formData, setFormData] = useState({
-    trash_type: [],
-    trash_amount: "",
+    trash_type: 9,
+    trash_amount: 10,
     address: "",
     request_term: "",
     image: null,
     money: 2500,
   });
 
-  const handleCheckboxChange = (type) => {
-    const updatedTypes = formData.trash_type.includes(type)
-      ? formData.trash_type.filter(t => t !== type)
-      : [...formData.trash_type, type];
-    setFormData({ ...formData, trash_type: updatedTypes });
+  const isFormValid = () => {
+    return (
+      formData.trash_type !== 9 &&
+      formData.trash_amount !== null &&
+      formData.address.trim() !== "" &&
+      formData.image !== null
+    );
   };
+
+  const handleTrashTypeToggle = (type) => {
+    setFormData((prev) => ({
+      ...prev,
+      trash_type: prev.trash_type === type ? 9 : type,
+    }));
+    if (type === 8) {
+      formData.trash_amount = 1;
+      setAmountText(`
+        음식물쓰레기는 1L 까지 기본 요금이며, 이후 1L당 추당 요금이 발생합니다.
+      `);
+    } else {
+      formData.trash_amount = 10;
+      setAmountText(`
+         10L 까지 기본 요금이며, 이후 1L당 추가 요금이 발생합니다.
+      `);
+    }
+  };
+
+  const trashTypeOptions = [
+    { id: 0, label: "월: 플라스틱류" },
+    { id: 5, label: "토: 불에 타는 쓰레기·병류" },
+    { id: 1, label: "화: 종이류" },
+    { id: 6, label: "일: 스티로폼" },
+    { id: 2, label: "수: 캔·고철류" },
+    { id: 7, label: "일반쓰레기" },
+    { id: 3, label: "목: 스티로폼·비닐류" },
+    { id: 8, label: "음식물쓰레기" },
+    { id: 4, label: "금: 플라스틱류" },
+  ];
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    if (name === 'request_term') {
+    if (name === "request_term") {
       setCharCount(value.length);
     }
     setFormData({ ...formData, [name]: value });
@@ -39,17 +79,27 @@ const RequestFormPage = () => {
   };
 
   const submitRequest = async (e) => {
-    e.preventDefault();
+    // e.preventDefault();
+    const data = new FormData();
+    data.append("trash_type", formData.trash_type);
+    data.append("trash_amount", formData.trash_amount);
+    data.append("address", formData.address);
+    data.append("request_term", formData.request_term);
+    data.append("money", formData.money);
+    data.append("image", formData.image);
+
     try {
-      const response = await axios.post("http://3.37.88.60/posts", formData, {
+      const response = await axios.post("http://3.37.88.60/posts", data, {
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "multipart/form-data",
         },
       });
-      
-      if (response.status === 200) {
-        navigate("/request-list");
-      }
+
+      // 성공적인 응답 처리
+      console.log("File uploaded successfully", response);
+
+      // 요청 목록 페이지로 이동
+      navigate("/request-list");
     } catch (error) {
       console.error("Error creating request:", error);
     }
@@ -58,108 +108,41 @@ const RequestFormPage = () => {
   return (
     <div className="form-container">
       <Header title="대행 요청하기" showBack={true} />
-      
+
       <div className="form-content">
         <div className="form-section">
-          <h2 className="section-title">쓰레기 종류</h2>
+          <h2 className="section-title-add">쓰레기 종류</h2>
           <div className="trash-types-grid">
-            <div className="trash-type-option">
-              <label className="trash-type-label">
-                <input
-                  type="checkbox"
-                  className="trash-type-checkbox"
-                  checked={formData.trash_type.includes('월: 플라스틱류')}
-                  onChange={() => handleCheckboxChange('월: 플라스틱류')}
-                />
-                월: 플라스틱류
-              </label>
-            </div>
-            <div className="trash-type-option">
-              <label className="trash-type-label">
-                <input
-                  type="checkbox"
-                  className="trash-type-checkbox"
-                  checked={formData.trash_type.includes('토: 불에 안타는')}
-                  onChange={() => handleCheckboxChange('토: 불에 안타는')}
-                />
-                토: 불에 안타는<br />쓰레기·병류
-              </label>
-            </div>
-            <div className="trash-type-option">
-              <label className="trash-type-label">
-                <input
-                  type="checkbox"
-                  className="trash-type-checkbox"
-                  checked={formData.trash_type.includes('화: 종이류')}
-                  onChange={() => handleCheckboxChange('화: 종이류')}
-                />
-                화: 종이류
-              </label>
-            </div>
-            <div className="trash-type-option">
-              <label className="trash-type-label">
-                <input
-                  type="checkbox"
-                  className="trash-type-checkbox"
-                  checked={formData.trash_type.includes('수: 캔·고철류')}
-                  onChange={() => handleCheckboxChange('수: 캔·고철류')}
-                />
-                수: 캔·고철류
-              </label>
-            </div>
-            <div className="trash-type-option">
-              <label className="trash-type-label">
-                <input
-                  type="checkbox"
-                  className="trash-type-checkbox"
-                  checked={formData.trash_type.includes('목: 스티로폼·비닐류')}
-                  onChange={() => handleCheckboxChange('목: 스티로폼·비닐류')}
-                />
-                목: 스티로폼·비닐류
-              </label>
-            </div>
-            <div className="trash-type-option">
-              <label className="trash-type-label">
-                <input
-                  type="checkbox"
-                  className="trash-type-checkbox"
-                  checked={formData.trash_type.includes('금: 플라스틱류')}
-                  onChange={() => handleCheckboxChange('금: 플라스틱류')}
-                />
-                금: 플라스틱류
-              </label>
-            </div>
-            <div className="trash-type-option">
-              <label className="trash-type-label">
-                <input
-                  type="checkbox"
-                  className="trash-type-checkbox"
-                  checked={formData.trash_type.includes('일반쓰레기')}
-                  onChange={() => handleCheckboxChange('일반쓰레기')}
-                />
-                일반쓰레기
-              </label>
-            </div>
-            <div className="trash-type-option">
-              <label className="trash-type-label">
-                <input
-                  type="checkbox"
-                  className="trash-type-checkbox"
-                  checked={formData.trash_type.includes('음식물쓰레기')}
-                  onChange={() => handleCheckboxChange('음식물쓰레기')}
-                />
-                음식물쓰레기
-              </label>
-            </div>
+            {trashTypeOptions.map((type) => (
+              <div
+                key={type.id}
+                onClick={() => handleTrashTypeToggle(type.id)}
+                onChange={() => handleTrashTypeToggle(type.id)}
+                className={`trash-type-option ${
+                  formData.trash_type === type.id ? "trash-type-selected" : ""
+                }`}
+              >
+                <label className="trash-type-label">
+                  <input
+                    type="checkbox"
+                    checked={formData.trash_type === type.id} // 하나만 선택되도록 비교
+                    onChange={() => handleTrashTypeToggle(type.id)}
+                    className="trash-type-checkbox"
+                  />
+
+                  {type.label}
+                </label>
+              </div>
+            ))}
           </div>
         </div>
 
         <div className="form-section">
-          <h2 className="section-title">쓰레기 종량(L)</h2>
-          <p className="section-description">10L 까지 기본 요금이며, 이후 1L 당 추가 요금이 발생합니다.</p>
-          <p className="section-description2">기본 요금: 2,500원, 1L당 추가 요금: 200원</p>
+          <p className="section-title-add">쓰레기 종량(L)</p>
+          <p className="section-description2">{amountText}</p>
+          <p className="section-description">{amountText2}</p>
           <input
-            type="text"
+            type="number"
             className="form-input"
             name="trash_amount"
             placeholder="숫자만 입력해주세요"
@@ -169,7 +152,7 @@ const RequestFormPage = () => {
         </div>
 
         <div className="form-section">
-          <h2 className="section-title">수거 요청 주소</h2>
+          <h2 className="section-title-add">수거 요청 주소</h2>
           <input
             type="text"
             className="form-input"
@@ -181,7 +164,7 @@ const RequestFormPage = () => {
         </div>
 
         <div className="form-section">
-          <h2 className="section-title">수거자에게 전할 말</h2>
+          <h2 className="section-title-add">수거자에게 전할 말</h2>
           <textarea
             className="form-textarea"
             name="request_term"
@@ -190,17 +173,19 @@ const RequestFormPage = () => {
             maxLength={20}
             onChange={handleInputChange}
           />
-          <div className="character-count">{charCount}/20</div>
+          <div className="character-count-add">{charCount}/20</div>
         </div>
 
         <div className="form-section">
-          <h2 className="section-title">쓰레기 사진 첨부</h2>
+          <h2 className="section-title-add">쓰레기 사진 첨부</h2>
           <input
             type="file"
             id="image-upload"
             className="file-input-hidden"
             accept="image/*"
-            onChange={(e) => setFormData({ ...formData, image: e.target.files[0] })}
+            onChange={(e) =>
+              setFormData({ ...formData, image: e.target.files[0] })
+            }
           />
           <label htmlFor="image-upload" className="file-upload-button">
             사진 첨부
@@ -219,9 +204,16 @@ const RequestFormPage = () => {
         <div className="form-footer">
           <div className="total-price">
             <span className="price-label">총액</span>
-            <span className="price-value">{calculatePrice(formData.trash_amount)}원</span>
+            <span className="price-value">
+              {calculatePrice(formData.trash_amount)}원
+            </span>
           </div>
-          <button className="submit-button" onClick={handleSubmit}>
+          <button
+            className="submit-button"
+            style={{ backgroundColor: isFormValid() ? "#92b9d8" : "#8c8c8c" }}
+            disabled={!isFormValid()}
+            onClick={handleSubmit}
+          >
             요청하기
           </button>
         </div>
@@ -260,14 +252,20 @@ const RequestFormPage = () => {
 };
 
 const calculatePrice = (amount) => {
-  if (!amount) return 2500;
-  const baseAmount = 10;
   const basePrice = 2500;
-  const additionalPrice = 200;
-  
-  const numAmount = parseInt(amount);
-  if (numAmount <= baseAmount) return basePrice;
-  return basePrice + (numAmount - baseAmount) * additionalPrice;
+  const amountNum = parseInt(amount) || 0;
+
+  // 1L 이하일 경우 기본 요금만 적용
+  if (amountNum <= (amount === 8 ? 1 : 10)) {
+    return basePrice;
+  }
+
+  // 초과분에 대한 요금 계산
+  const extraAmount = amountNum - (amount === 8 ? 1 : 10);
+  const extraPrice = extraAmount * 200;
+
+  amount = basePrice + extraPrice;
+  return basePrice + extraPrice;
 };
 
 export default RequestFormPage;
