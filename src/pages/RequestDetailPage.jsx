@@ -11,7 +11,7 @@ const RequestDetailPage = () => {
     // API에서 요청 상세 정보를 가져오는 로직
     const fetchRequestDetail = async () => {
       try {
-        const response = await fetch(`http://localhost:80/posts/${id}`);
+        const response = await fetch(`http://3.37.88.60/posts/${id}`);
         const data = await response.json();
         setRequest(data.data);
       } catch (error) {
