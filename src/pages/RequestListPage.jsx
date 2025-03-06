@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/common/Header';
 import TabMenu from '../components/tabs/TabMenu';
 import '../styles/requestList.css';
+import Modal from '../components/common/Modal';
 
 // 임시 데이터
 const dummyRequests = [
@@ -53,7 +54,45 @@ const RequestListPage = () => {
   const [requests, setRequests] = useState([]);
   const [filter, setFilter] = useState('최신순');
   const [showCompleted, setShowCompleted] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  // const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // const setIsModalOpen = () => {
+  //   setIsModalOpen(!prev); 
+  // }
+  
+    // 모달 상태 관리
+    const [isAcceptModalOpen, setIsAcceptModalOpen] = useState(false);
+    const [isCompletedModalOpen, setIsCompletedModalOpen] = useState(false);
+
+    const [selectedRequestId, setSelectedRequestId] = useState(null);
+  
+    // 모달 열기 함수들
+    const openAcceptModal = (requestId) => {
+      setSelectedRequestId(requestId);
+      setIsAcceptModalOpen(true);
+    };
+  
+    const openCompletedModal = (requestId) => {
+      setSelectedRequestId(requestId);
+      setIsCompletedModalOpen(true);
+    };
+  
+    // 모달 닫기 함수들
+    const closeAcceptModal = () => {
+      setIsAcceptModalOpen(false);
+    };
+  
+    const closeCompletedModal = () => {
+      setIsCompletedModalOpen(false);
+    };
+    const handleAcceptConfirm = () => {
+      console.log('handle accept conform');
+    }
+
+    const handleCompleteConfirm = () => {
+      console.log('handle complete conform');
+    }
 
   useEffect(() => {
     // API 호출 대신 임시 데이터 사용
@@ -99,56 +138,32 @@ const RequestListPage = () => {
 
   return (
     <div className="list-container">
-      <div className="relative">
-        <Header 
-          title="배출 대행" 
-          showBack={true}
-          showMenu={false}
-        />
-        <div className="absolute right-4 top-3">
-          <button
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="text-white text-2xl"
-          >
-            ☰
-          </button>
-          {isDropdownOpen && (
-            <div className="absolute right-0 top-full mt-1 w-32 bg-white rounded-lg shadow-lg overflow-hidden z-50">
-              <button
-                onClick={() => {
-                  navigate('/');
-                  setIsDropdownOpen(false);
-                }}
-                className="w-full px-4 py-3 text-left hover:bg-gray-50"
-              >
-                <span className="text-gray-700">지도</span>
-              </button>
-              <button
-                onClick={() => {
-                  navigate('/guide');
-                  setIsDropdownOpen(false);
-                }}
-                className="w-full px-4 py-3 text-left hover:bg-gray-50 border-t border-gray-100"
-              >
-                <span className="text-gray-700">클린하우스란?</span>
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
+      <Header title="배출 대행" />
       
       <div className="list-content">
-        <div className="show-completed-toggle mt-4 px-4">
-          <input 
-            type="checkbox" 
-            id="show-completed" 
-            className="toggle-checkbox"
-            checked={showCompleted}
-            onChange={(e) => setShowCompleted(e.target.checked)}
-          />
-          <label htmlFor="show-completed" className="toggle-label">
-            배출 완료된 건 보기
-          </label>
+        <div className="filter-bar">
+          <button
+            onClick={() => setIsFilterModalOpen(true)}
+            className="filter-button"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="filter-icon">
+              <path d="M3 18h6v-2H3v2zM3 6v2h18V6H3zm0 7h12v-2H3v2z" fill="#000"/>
+            </svg>
+            {filter}
+          </button>
+          
+          <div className="show-completed-toggle">
+            <input 
+              type="checkbox" 
+              id="show-completed" 
+              className="toggle-checkbox"
+              checked={showCompleted}
+              onChange={(e) => setShowCompleted(e.target.checked)}
+            />
+            <label htmlFor="show-completed" className="toggle-label">
+              배출 완료된 건 보기
+            </label>
+          </div>
         </div>
         
         {filteredRequests().map(request => (
@@ -175,7 +190,7 @@ const RequestListPage = () => {
               <div className="action-buttons">
                 {request.status === '요청중' && (
                   <button 
-                    onClick={() => navigate(`/request/${request.id}`)}
+                    onClick={() => openAcceptModal()}
                     className="accept-button"
                   >
                     수락하기
@@ -184,7 +199,7 @@ const RequestListPage = () => {
                 
                 {request.status === '수거중' && (
                   <button 
-                    onClick={() => navigate(`/request/${request.id}`)}
+                    onClick={() => openCompletedModal()}
                     className="complete-button"
                   >
                     대행완료
@@ -195,6 +210,67 @@ const RequestListPage = () => {
           </div>
         ))}
       </div>
+      
+      {/* 필터 모달 */}
+      {isFilterModalOpen && (
+        <div className="modal-overlay">
+          <div className="filter-modal">
+            <h2 className="modal-title">정렬</h2>
+            <div className="sort-options">
+              <button 
+                className={`sort-option ${filter === '최신순' ? 'sort-selected' : ''}`}
+                onClick={() => {
+                  setFilter('최신순');
+                  setIsFilterModalOpen(false);
+                }}
+              >
+                최신순
+              </button>
+              <button
+                className={`sort-option ${filter === '오래된순' ? 'sort-selected' : ''}`}
+                onClick={() => {
+                  setFilter('오래된순');
+                  setIsFilterModalOpen(false);
+                }}
+              >
+                오래된순
+              </button>
+            </div>
+            <button 
+              className="close-modal-button"
+              onClick={() => setIsFilterModalOpen(false)}
+            >
+              닫기
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 수락 확인 모달 */}
+      <Modal
+        isOpen={isAcceptModalOpen}
+        onClose={closeAcceptModal}
+        title="요청을 수락하시겠습니까?"
+        children="수락 후, 2번이상 수거 하지 않을 시 이용이 제한됩니다."
+        confirmText="수락"
+        cancelText="닫기"
+        onConfirm={handleAcceptConfirm}
+        variant="primary"
+      >
+      </Modal>
+      
+      {/* 대행 완료 모달 */}
+      <Modal
+        isOpen={isCompletedModalOpen}
+        onClose={closeCompletedModal}
+        title="쓰레기 배출이 완료되었나요?"
+        children="환경을 위한 한 걸음! 당신의 한 걸음이 제주를 깨끗하게 만들었어요!"
+        confirmText="네"
+        cancelText="아니오"
+        onConfirm={handleCompleteConfirm}
+        variant="primary"
+      >
+      </Modal>
       
       <TabMenu activeTab="request-list" />
     </div>
