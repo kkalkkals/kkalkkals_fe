@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/common/Header";
-import TabMenu from "../components/tabs/TabMenu";
 import Modal from "../components/common/Modal"; // 모달 추가
 import RequestCard from "../components/request/RequestCard"; // RequestCard 적용
 import "../styles/requestList.css";
@@ -204,7 +203,7 @@ const RequestListPage = () => {
         variant="primary"
       />
 
-      <TabMenu activeTab="request-list" />
+      {/* <TabMenu activeTab="request-list" /> */}
     </div>
   );
 };
