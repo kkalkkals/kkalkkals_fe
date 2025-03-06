@@ -177,24 +177,31 @@ const getMarkerImage = (type) => {
   };
 
   const handleKakaoMap = (e) => {
-    console.log(selectedFacility);
-    if (!selectedFacility || !currentPosition) {
+    if (!selectedFacility) {
       alert("현재 위치 또는 선택한 시설 정보가 없습니다.");
       return;
     }
-
+  
+    // 디버깅을 위한 로그 추가
+    console.log("Selected facility:", JSON.stringify(selectedFacility));
+    
     // 도착지 이름
     const destinationName = selectedFacility.name || (selectedFacility.type === "cleanhouse" ? "클린하우스" : "재활용도움센터");
     
-    // 도착지 좌표
-    const destinationX = selectedFacility.longitude;
-    const destinationY = selectedFacility.latitude;
-
-    const kakaoMapUrl = `https://map.kakao.com/link/to/${destinationName},${destinationY},${destinationX}`;
-    console.log(kakaoMapUrl);
+    // 도착지 좌표 - 명확한 이름으로 변수 재정의
+    const longitude = selectedFacility.longitude;
+    const latitude = selectedFacility.latitude;
+    
+    console.log(`Name: ${destinationName}, Coordinates: lat=${latitude}, lng=${longitude}`);
+    
+    // 카카오맵 URL 형식: 위치명,위도,경도 순서
+    const kakaoMapUrl = `https://map.kakao.com/link/to/${destinationName},${latitude},${longitude}`;
+    console.log("Generated URL:", kakaoMapUrl);
+    
     // 새 창에서 카카오맵 열기
     window.open(kakaoMapUrl, '_blank');
   };
+
 
   if (!isLoaded) {
     return (
@@ -261,6 +268,11 @@ const handleSearchChange = (e) => {
     district.name.toLowerCase().includes(value.toLowerCase())
   );
   
+  if (filtered.length === 0) {
+    e.target.value = "";
+    return;
+  }
+
   setSearchResults(filtered);
   setShowSearchResults(true);
 };
@@ -279,6 +291,7 @@ const handleDistrictSelect = (district) => {
     
     setCenter({ lat: district.lat, lng: district.lng });
     setLevel(district.level);
+    setSelectedFacility(null);
   }
   
   // 검색 UI 초기화
