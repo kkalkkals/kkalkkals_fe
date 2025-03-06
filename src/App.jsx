@@ -19,6 +19,7 @@ const App = () => {
           <Route path="/request-list" element={<RequestListPage />} />
           <Route path="/request-form" element={<RequestFormPage />} />
           <Route path="/request/:id" element={<RequestDetailPage />} />
+          <Route path="/request-detail" element={<RequestDetailPage />} />
           <Route path="/guide" element={<GuidePage />} />
         </Routes>
       </div>
