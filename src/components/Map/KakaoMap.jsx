@@ -6,7 +6,7 @@ import axios from "axios";
 const KakaoMap = () => {
   const kakaoApiKey = process.env.REACT_APP_KAKAO_MAP_API_KEY;
   const mapRef = useRef(null);
-  const [center, setCenter] = useState({ lat: 33.450701, lng: 126.570667 });
+  const [center, setCenter] = useState({ lat: 33.487182768, lng: 126.531717176 });
   const [currentPosition, setCurrentPosition] = useState(null);
   const [level, setLevel] = useState(3);
   const [selectedFacility, setSelectedFacility] = useState(null);
@@ -35,21 +35,21 @@ const KakaoMap = () => {
     }
   }, []);
 
-  // 현재 위치 가져오기
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          setCurrentPosition({ lat: latitude, lng: longitude });
-          setCenter({ lat: latitude, lng: longitude });
-        },
-        (error) => {
-          console.error("Error getting current position:", error);
-        }
-      );
-    }
-  }, []);
+  // // 현재 위치 가져오기 htts에서만 geolocation 이용 가능
+  // useEffect(() => {
+  //   if (navigator.geolocation) {
+  //     navigator.geolocation.getCurrentPosition(
+  //       (position) => {
+  //         const { latitude, longitude } = position.coords;
+  //         setCurrentPosition({ lat: latitude, lng: longitude });
+  //         setCenter({ lat: latitude, lng: longitude });
+  //       },
+  //       (error) => {
+  //         console.error("Error getting current position:", error);
+  //       }
+  //     );
+  //   }
+  // }, []);
 
 
     // 구름스퀘어 위치로 이동하는 함수
