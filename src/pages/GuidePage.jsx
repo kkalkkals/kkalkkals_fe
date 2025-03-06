@@ -1,6 +1,6 @@
 import React from 'react';
 import Header from '../components/common/Header';
-import './GuidePage.css';
+import '../styles/guide.css';
 
 const GuidePage = () => {
   return (

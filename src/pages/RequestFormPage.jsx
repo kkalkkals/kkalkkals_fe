@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/common/Header';
 import TabMenu from '../components/tabs/TabMenu';
-import './RequestFormPage.css';
+import '../styles/requestForm.css';
 
 const RequestFormPage = () => {
   const navigate = useNavigate();
