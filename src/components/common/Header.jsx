@@ -13,7 +13,7 @@ const Header = ({ title, showBack = true, showMenu = true }) => {
         { label: '클린하우스란?', path: '/guide' }
       ]
     : [
-        { label: '지도', path: '/' },
+        { label: '지도', path: '/map' },
         { label: '클린하우스란?', path: '/guide' }
       ];
 
