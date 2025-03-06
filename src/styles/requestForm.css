@@ -90,6 +90,7 @@
 
 .form-input::-webkit-inner-spin-button {
   -webkit-animation: none;
+  display: none;
 }
 
 .form-input::placeholder {

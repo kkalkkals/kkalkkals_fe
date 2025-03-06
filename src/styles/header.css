@@ -28,9 +28,9 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: #92B9D8;
+  color: #92b9d8;
   padding: 0;
-  margin-right: 12px;
+  /* margin-right: 12px; */
 }
 
 .back-button svg {
@@ -39,13 +39,13 @@
 }
 
 .header-title {
-  font-family: 'Dongle', sans-serif;
-  font-size: 24px;
-  color: #92B9D8;
+  font-family: "Dongle", sans-serif;
+  font-size: 20px;
+  color: #92b9d8;
   font-weight: 500;
   flex: 1;
   text-align: center;
-  margin-right: 44px;
+  /* margin-right: 44px; */
 }
 
 .menu-button {
@@ -58,7 +58,7 @@
   border: none;
   border-radius: 50%;
   cursor: pointer;
-  color: #92B9D8;
+  color: #92b9d8;
   padding: 0;
   box-shadow: 0 4px 16px rgba(141, 211, 242, 0.15);
   transition: all 0.3s ease;
@@ -67,7 +67,7 @@
 .menu-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(141, 211, 242, 0.25);
-  background: #F8FBFD;
+  background: #f8fbfd;
 }
 
 .menu-button svg {
@@ -99,16 +99,16 @@
   background: white;
   border: none;
   cursor: pointer;
-  color: #2C3E50;
+  color: #2c3e50;
   font-size: 14px;
   font-weight: 500;
   transition: all 0.2s ease;
 }
 
 .menu-item:hover {
-  background: #F8FBFD;
+  background: #f8fbfd;
 }
 
 .menu-item svg {
   display: none;
-} 
+}

@@ -116,8 +116,6 @@ const RequestFormPage = () => {
             {trashTypeOptions.map((type) => (
               <div
                 key={type.id}
-                onClick={() => handleTrashTypeToggle(type.id)}
-                onChange={() => handleTrashTypeToggle(type.id)}
                 className={`trash-type-option ${
                   formData.trash_type === type.id ? "trash-type-selected" : ""
                 }`}
@@ -154,7 +152,7 @@ const RequestFormPage = () => {
         <div className="form-section">
           <h2 className="section-title-add">수거 요청 주소</h2>
           <input
-            type="text"
+            type="search-form"
             className="form-input"
             name="address"
             placeholder="도로명 주소로 입력해주세요"
