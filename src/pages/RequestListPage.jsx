@@ -1,264 +1,189 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Header from '../components/common/Header';
-import TabMenu from '../components/tabs/TabMenu';
-import '../styles/requestList.css';
-import Modal from '../components/common/Modal';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Header from "../components/common/Header";
+import TabMenu from "../components/tabs/TabMenu";
+import Modal from "../components/common/Modal"; // 모달 추가
+import RequestCard from "../components/request/RequestCard"; // RequestCard 적용
+import "../styles/requestList.css";
 
-// 임시 데이터
-const dummyRequests = [
-  {
-    id: 1,
-    date: '2025-03-05',
-    status: '요청중',
-    trashType: '일반쓰레기, 유리류',
-    trashAmount: '20L',
-    location: '제주시 구남동 1길 12',
-    requestDetails: '유리 수거 하실 때 조심하세요!',
-    image: null
-  },
-  {
-    id: 2,
-    date: '2025-03-02',
-    status: '요청중',
-    trashType: '일반쓰레기, 유리류',
-    trashAmount: '20L',
-    location: '제주시 구남동 1길 12',
-    requestDetails: '유리 수거 하실 때 조심하세요!',
-    image: null
-  },
-  {
-    id: 3,
-    date: '2025-03-06',
-    status: '수거중',
-    trashType: '일반쓰레기, 유리류',
-    trashAmount: '20L',
-    location: '제주시 구남동 1길 12',
-    requestDetails: '유리 수거 하실 때 조심하세요!',
-    image: null
-  },
-  {
-    id: 4,
-    date: '2025-03-06',
-    status: '완료됨',
-    trashType: '일반쓰레기, 유리류',
-    trashAmount: '20L',
-    location: '제주시 구남동 1길 12',
-    requestDetails: '유리 수거 하실 때 조심하세요!',
-    image: null
-  }
-];
+const API_URL = "http://3.37.88.60:80/posts/all"; // 백엔드 API 주소
 
 const RequestListPage = () => {
   const navigate = useNavigate();
   const [requests, setRequests] = useState([]);
-  const [filter, setFilter] = useState('최신순');
+  const [filter, setFilter] = useState("최신순");
   const [showCompleted, setShowCompleted] = useState(false);
-  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-  // const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  // const setIsModalOpen = () => {
-  //   setIsModalOpen(!prev); 
-  // }
-  
-    // 모달 상태 관리
-    const [isAcceptModalOpen, setIsAcceptModalOpen] = useState(false);
-    const [isCompletedModalOpen, setIsCompletedModalOpen] = useState(false);
-
-    const [selectedRequestId, setSelectedRequestId] = useState(null);
-  
-    // 모달 열기 함수들
-    const openAcceptModal = (requestId) => {
-      setSelectedRequestId(requestId);
-      setIsAcceptModalOpen(true);
-    };
-  
-    const openCompletedModal = (requestId) => {
-      setSelectedRequestId(requestId);
-      setIsCompletedModalOpen(true);
-    };
-  
-    // 모달 닫기 함수들
-    const closeAcceptModal = () => {
-      setIsAcceptModalOpen(false);
-    };
-  
-    const closeCompletedModal = () => {
-      setIsCompletedModalOpen(false);
-    };
-    const handleAcceptConfirm = () => {
-      console.log('handle accept conform');
-    }
-
-    const handleCompleteConfirm = () => {
-      console.log('handle complete conform');
-    }
+  // 모달 상태 추가
+  const [isAcceptModalOpen, setIsAcceptModalOpen] = useState(false);
+  const [isCompletedModalOpen, setIsCompletedModalOpen] = useState(false);
+  const [selectedRequestId, setSelectedRequestId] = useState(null);
 
   useEffect(() => {
-    // API 호출 대신 임시 데이터 사용
-    setRequests(dummyRequests);
+    const fetchRequests = async () => {
+      try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+
+        console.log("Fetched Data:", data);
+
+        if (!data.data || !Array.isArray(data.data)) {
+          throw new Error("API 응답이 예상과 다릅니다.");
+        }
+
+        const formattedRequests = data.data.map((post) => ({
+          id: post.post_id,
+          date: new Date(post.date).toISOString().split("T")[0], // 날짜 변환
+          status: post.status === 0 ? "요청중" : post.status === 1 ? "수거중" : "완료됨",
+          trashType: post.trash_type,
+          trashAmount: `${post.trash_amount}L`,
+          location: post.address,
+          requestDetails: post.request_term || "요청사항 없음",
+          image: post.image,
+        }));
+
+        setRequests(formattedRequests);
+      } catch (error) {
+        console.error("Error fetching posts:", error);
+      }
+    };
+
+    fetchRequests();
   }, []);
 
   // 필터링된 요청 목록
   const filteredRequests = () => {
     let filtered = [...requests];
-    
-    // 완료된 항목 필터링
+
     if (!showCompleted) {
-      filtered = filtered.filter(request => 
-        request.status !== '완료됨' && request.status !== '취소됨'
+      filtered = filtered.filter(request =>
+        request.status !== "완료됨" && request.status !== "취소됨"
       );
     }
-    
-    // 정렬
-    if (filter === '최신순') {
+
+    if (filter === "최신순") {
       filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
     } else {
       filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
     }
-    
+
     return filtered;
   };
 
-  // 상태 배지 스타일 클래스명 반환
-  const getStatusBadgeClass = (status) => {
-    switch (status) {
-      case '요청중':
-        return 'status-badge status-pending';
-      case '수거중':
-        return 'status-badge status-collecting';
-      case '완료됨':
-        return 'status-badge status-completed';
-      case '취소됨':
-        return 'status-badge status-canceled';
-      default:
-        return 'status-badge status-default';
-    }
+  // 요청 수락 모달 열기
+  const openAcceptModal = (requestId) => {
+    setSelectedRequestId(requestId);
+    setIsAcceptModalOpen(true);
+  };
+
+  // 대행 완료 모달 열기
+  const openCompletedModal = (requestId) => {
+    setSelectedRequestId(requestId);
+    setIsCompletedModalOpen(true);
+  };
+
+  // 모달 닫기 함수
+  const closeAcceptModal = () => setIsAcceptModalOpen(false);
+  const closeCompletedModal = () => setIsCompletedModalOpen(false);
+
+  // 요청 수락 처리
+  const handleAcceptConfirm = () => {
+    console.log(`요청 ${selectedRequestId} 수락`);
+    // TODO: 백엔드 API에 요청 수락 로직 추가
+    closeAcceptModal();
+  };
+
+  // 대행 완료 처리
+  const handleCompleteConfirm = () => {
+    console.log(`요청 ${selectedRequestId} 대행 완료`);
+    // TODO: 백엔드 API에 대행 완료 요청 추가
+    closeCompletedModal();
   };
 
   return (
     <div className="list-container">
-      <Header title="배출 대행" />
-      
-      <div className="list-content">
-        <div className="filter-bar">
+      <div className="relative">
+        <Header title="배출 대행" showBack={true} showMenu={false} />
+        <div className="absolute right-4 top-3">
           <button
-            onClick={() => setIsFilterModalOpen(true)}
-            className="filter-button"
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            className="text-white text-2xl"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="filter-icon">
-              <path d="M3 18h6v-2H3v2zM3 6v2h18V6H3zm0 7h12v-2H3v2z" fill="#000"/>
-            </svg>
-            {filter}
+            ☰
           </button>
-          
-          <div className="show-completed-toggle">
-            <input 
-              type="checkbox" 
-              id="show-completed" 
-              className="toggle-checkbox"
-              checked={showCompleted}
-              onChange={(e) => setShowCompleted(e.target.checked)}
-            />
-            <label htmlFor="show-completed" className="toggle-label">
-              배출 완료된 건 보기
-            </label>
-          </div>
-        </div>
-        
-        {filteredRequests().map(request => (
-          <div key={request.id} className="request-card">
-            <div className="request-header">
-              <div className="date-badge">
-                {request.date}
-              </div>
-              <span className={getStatusBadgeClass(request.status)}>
-                {request.status}
-              </span>
-            </div>
-            
-            <div className="request-details">
-              <p className="detail-item">쓰레기 종류: {request.trashType}</p>
-              <p className="detail-item">쓰레기 총량(L): {request.trashAmount}</p>
-              <p className="detail-item">수거 위치: {request.location}</p>
-              <p className="detail-item">수거 요청사항: {request.requestDetails}</p>
-            </div>
-            
-            <div className="request-footer">
-              <div className="request-image"></div>
-              
-              <div className="action-buttons">
-                {request.status === '요청중' && (
-                  <button 
-                    onClick={() => openAcceptModal()}
-                    className="accept-button"
-                  >
-                    수락하기
-                  </button>
-                )}
-                
-                {request.status === '수거중' && (
-                  <button 
-                    onClick={() => openCompletedModal()}
-                    className="complete-button"
-                  >
-                    대행완료
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-      
-      {/* 필터 모달 */}
-      {isFilterModalOpen && (
-        <div className="modal-overlay">
-          <div className="filter-modal">
-            <h2 className="modal-title">정렬</h2>
-            <div className="sort-options">
-              <button 
-                className={`sort-option ${filter === '최신순' ? 'sort-selected' : ''}`}
+          {isDropdownOpen && (
+            <div className="absolute right-0 top-full mt-1 w-32 bg-white rounded-lg shadow-lg overflow-hidden z-50">
+              <button
                 onClick={() => {
-                  setFilter('최신순');
-                  setIsFilterModalOpen(false);
+                  navigate("/");
+                  setIsDropdownOpen(false);
                 }}
+                className="w-full px-4 py-3 text-left hover:bg-gray-50"
               >
-                최신순
+                <span className="text-gray-700">지도</span>
               </button>
               <button
-                className={`sort-option ${filter === '오래된순' ? 'sort-selected' : ''}`}
                 onClick={() => {
-                  setFilter('오래된순');
-                  setIsFilterModalOpen(false);
+                  navigate("/guide");
+                  setIsDropdownOpen(false);
                 }}
+                className="w-full px-4 py-3 text-left hover:bg-gray-50 border-t border-gray-100"
               >
-                오래된순
+                <span className="text-gray-700">클린하우스란?</span>
               </button>
             </div>
-            <button 
-              className="close-modal-button"
-              onClick={() => setIsFilterModalOpen(false)}
-            >
-              닫기
-            </button>
-          </div>
+          )}
         </div>
-      )}
+      </div>
+
+      {/* 필터 UI */}
+      <div className="filter-bar px-4 mt-4 flex items-center justify-between">
+        <button
+          onClick={() => setFilter(filter === "최신순" ? "오래된순" : "최신순")}
+          className="filter-button px-4 py-2 border rounded-lg text-sm"
+        >
+          {filter} ⬇
+        </button>
+
+        <div className="show-completed-toggle flex items-center">
+          <input 
+            type="checkbox" 
+            id="show-completed" 
+            className="toggle-checkbox"
+            checked={showCompleted}
+            onChange={(e) => setShowCompleted(e.target.checked)}
+          />
+          <label htmlFor="show-completed" className="ml-2 text-sm text-gray-600">
+            배출 완료된 건 보기
+          </label>
+        </div>
+      </div>
+
+      {/* 요청 목록 */}
+      <div className="list-content mt-4">
+        {filteredRequests().map(request => (
+          <RequestCard
+            key={request.id}
+            request={request}
+            onAccept={openAcceptModal}
+            onComplete={openCompletedModal}
+          />
+        ))}
+      </div>
 
       {/* 수락 확인 모달 */}
       <Modal
         isOpen={isAcceptModalOpen}
         onClose={closeAcceptModal}
         title="요청을 수락하시겠습니까?"
-        children="수락 후, 2번이상 수거 하지 않을 시 이용이 제한됩니다."
+        children="수락 후, 2번 이상 수거하지 않을 시 이용이 제한됩니다."
         confirmText="수락"
         cancelText="닫기"
         onConfirm={handleAcceptConfirm}
         variant="primary"
-      >
-      </Modal>
-      
+      />
+
       {/* 대행 완료 모달 */}
       <Modal
         isOpen={isCompletedModalOpen}
@@ -269,9 +194,8 @@ const RequestListPage = () => {
         cancelText="아니오"
         onConfirm={handleCompleteConfirm}
         variant="primary"
-      >
-      </Modal>
-      
+      />
+
       <TabMenu activeTab="request-list" />
     </div>
   );
