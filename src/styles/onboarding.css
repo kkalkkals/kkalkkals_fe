@@ -3,24 +3,13 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    /* width: 390px; */
-    height: 852px;
+    height: 652px;
     background: #f8f9fa;
     border-radius: 10px;
-    /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
     padding: 20px;
     text-align: center;
     position: relative;
 }
-/* 
-.onboarding-slide {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-
-} */
 .onboarding-slides {
     display: flex;
     width: 100%;
@@ -67,7 +56,7 @@
 /* 🔵 슬라이드 인디케이터 스타일 */
 .onboarding-indicators {
     position: absolute;
-    bottom: 150px; /* 하단 버튼(20px) + 여백(30px) + 추가 마진(10px) */
+    bottom: 120px; /* 하단 버튼(20px) + 여백(30px) + 추가 마진(10px) */
     left: 50%;
     transform: translateX(-50%);
     display: flex;
