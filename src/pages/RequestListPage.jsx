@@ -134,18 +134,20 @@ const RequestListPage = () => {
       <div className="list-content">
         <div className="filter-bar">
           <button
-            onClick={() => navigate('/request-form')}
+            onClick={() => navigate("/request-form")}
             className="create-request-button"
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
             </svg>
             배출대행 신청하기
           </button>
 
           <div className="filter-row">
             <button
-              onClick={() => setFilter(filter === "최신순" ? "오래된순" : "최신순")}
+              onClick={() =>
+                setFilter(filter === "최신순" ? "오래된순" : "최신순")
+              }
               className="filter-button"
             >
               {filter} ⬇
@@ -159,10 +161,7 @@ const RequestListPage = () => {
                 checked={showCompleted}
                 onChange={(e) => setShowCompleted(e.target.checked)}
               />
-              <label
-                htmlFor="show-completed"
-                className="toggle-label"
-              >
+              <label htmlFor="show-completed" className="toggle-label">
                 배출 완료된 건 보기
               </label>
             </div>
@@ -203,8 +202,6 @@ const RequestListPage = () => {
         onConfirm={handleCompleteConfirm}
         variant="primary"
       />
-
-      {/* <TabMenu activeTab="request-list" /> */}
     </div>
   );
 };

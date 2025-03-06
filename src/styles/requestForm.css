@@ -24,7 +24,7 @@
   border: 1px solid #eee;
 }
 
-.section-title {
+.section-title-add {
   font-size: 16px;
   font-weight: bold;
   margin-bottom: 12px;
@@ -88,6 +88,10 @@
   background: white;
 }
 
+.form-input::-webkit-inner-spin-button {
+  -webkit-animation: none;
+}
+
 .form-input::placeholder {
   color: #999;
 }
@@ -109,7 +113,7 @@
   color: #999;
 }
 
-.character-count {
+.character-count-add {
   font-size: 12px;
   color: #999;
   text-align: right;
@@ -169,7 +173,7 @@
 .submit-button {
   width: 100%;
   padding: 14px;
-  background: #92B9D8;
+  background: #92b9d8;
   color: white;
   border: none;
   border-radius: 12px;
@@ -179,7 +183,7 @@
 }
 
 .submit-button:hover {
-  background: #7BA8C9;
+  background: #7ba8c9;
 }
 
 /* 모달 스타일 */
@@ -237,7 +241,7 @@
 .modal-button-confirm {
   flex: 1;
   padding: 12px;
-  background-color: #92B9D8;
+  background-color: #92b9d8;
   color: white;
   border: none;
   border-radius: 12px;

@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import MainPage from './pages/MainPage';
 import RequestListPage from './pages/RequestListPage';
 import RequestFormPage from './pages/RequestFormPage';
-import RequestDetailPage from './pages/RequestDetailPage';
 import LoginPage from './pages/LoginPage';
 import GuidePage from './pages/GuidePage';
 
@@ -16,7 +15,6 @@ const App = () => {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/request-list" element={<RequestListPage />} />
           <Route path="/request-form" element={<RequestFormPage />} />
-          <Route path="/request/:id" element={<RequestDetailPage />} />
           <Route path="/guide" element={<GuidePage />} />
         </Routes>
       </div>
