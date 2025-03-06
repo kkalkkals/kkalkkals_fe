@@ -128,68 +128,48 @@ const RequestListPage = () => {
 
   return (
     <div className="list-container">
-      <div className="relative">
-        <Header title="배출 대행" showBack={true} showMenu={false} />
-        <div className="absolute right-4 top-3">
-          <button
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="text-white text-2xl"
-          >
-            ☰
-          </button>
-          {isDropdownOpen && (
-            <div className="absolute right-0 top-full mt-1 w-32 bg-white rounded-lg shadow-lg overflow-hidden z-50">
-              <button
-                onClick={() => {
-                  navigate("/");
-                  setIsDropdownOpen(false);
-                }}
-                className="w-full px-4 py-3 text-left hover:bg-gray-50"
-              >
-                <span className="text-gray-700">지도</span>
-              </button>
-              <button
-                onClick={() => {
-                  navigate("/guide");
-                  setIsDropdownOpen(false);
-                }}
-                className="w-full px-4 py-3 text-left hover:bg-gray-50 border-t border-gray-100"
-              >
-                <span className="text-gray-700">클린하우스란?</span>
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
+      <Header title="배출 대행" showBack={true} showMenu={true} />
 
       {/* 필터 UI */}
-      <div className="filter-bar px-4 mt-4 flex items-center justify-between">
-        <button
-          onClick={() => setFilter(filter === "최신순" ? "오래된순" : "최신순")}
-          className="filter-button px-4 py-2 border rounded-lg text-sm"
-        >
-          {filter} ⬇
-        </button>
-
-        <div className="show-completed-toggle flex items-center">
-          <input
-            type="checkbox"
-            id="show-completed"
-            className="toggle-checkbox"
-            checked={showCompleted}
-            onChange={(e) => setShowCompleted(e.target.checked)}
-          />
-          <label
-            htmlFor="show-completed"
-            className="ml-2 text-sm text-gray-600"
+      <div className="list-content">
+        <div className="filter-bar">
+          <button
+            onClick={() => navigate('/request-form')}
+            className="create-request-button"
           >
-            배출 완료된 건 보기
-          </label>
-        </div>
-      </div>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+            </svg>
+            배출대행 신청하기
+          </button>
 
-      {/* 요청 목록 */}
-      <div className="list-content mt-4">
+          <div className="filter-row">
+            <button
+              onClick={() => setFilter(filter === "최신순" ? "오래된순" : "최신순")}
+              className="filter-button"
+            >
+              {filter} ⬇
+            </button>
+
+            <div className="show-completed-toggle">
+              <input
+                type="checkbox"
+                id="show-completed"
+                className="toggle-checkbox"
+                checked={showCompleted}
+                onChange={(e) => setShowCompleted(e.target.checked)}
+              />
+              <label
+                htmlFor="show-completed"
+                className="toggle-label"
+              >
+                배출 완료된 건 보기
+              </label>
+            </div>
+          </div>
+        </div>
+
+        {/* 요청 목록 */}
         {filteredRequests().map((request) => (
           <RequestCard
             key={request.id}
