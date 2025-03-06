@@ -251,6 +251,11 @@
   transform: translateY(-1px);
 }
 
+.finish-button {
+  background: rgba(9, 9, 9, 0.15);
+  color: #000000;
+}
+
 /* 필터 영역 */
 .filter-bar {
   width: 100%;

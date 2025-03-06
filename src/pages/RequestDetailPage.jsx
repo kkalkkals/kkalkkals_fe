@@ -18,6 +18,7 @@ const RequestDetailPage = () => {
 
     fetchRequestDetail();
   }, [id]);
+
   const fetchRequestDetail = async () => {
     try {
       const response = await fetch(`http://3.37.88.60/posts/${id}`);
@@ -27,6 +28,7 @@ const RequestDetailPage = () => {
       console.error("Error fetching request details:", error);
     }
   };
+
   if (!request) {
     return (
       <div className="detail-container">
@@ -111,6 +113,11 @@ const RequestDetailPage = () => {
       // 성공적인 응답 처리
       console.log("File uploaded successfully", response);
 
+      setRequest((prevRequest) => ({
+        ...prevRequest,
+        status: prevRequest.status === 0 ? 1 : 2, // 요청중(0) → 수거중(1) → 완료됨(2)
+      }));
+
       fetchRequestDetail();
     } catch (error) {
       // 에러 처리
@@ -174,7 +181,7 @@ const RequestDetailPage = () => {
               className="action-button accept-button"
               onClick={(e) => {
                 e.stopPropagation();
-                openAcceptModal(request.id);
+                openAcceptModal(id);
               }}
             >
               수락하기
@@ -185,10 +192,20 @@ const RequestDetailPage = () => {
               className="action-button complete-button"
               onClick={(e) => {
                 e.stopPropagation();
-                openCompletedModal(request.id);
+                openCompletedModal(id);
               }}
             >
               대행완료
+            </button>
+          )}
+          {request.status === 2 && (
+            <button
+              className="action-button finish-button"
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
+              완료됨
             </button>
           )}
         </div>
