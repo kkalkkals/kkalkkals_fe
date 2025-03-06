@@ -6,7 +6,6 @@ import RequestFormPage from './pages/RequestFormPage';
 import RequestDetailPage from './pages/RequestDetailPage';
 import LoginPage from './pages/LoginPage';
 import GuidePage from './pages/GuidePage';
-import Menu from './components/common/Menu';
 
 const App = () => {
   return (
@@ -19,12 +18,6 @@ const App = () => {
           <Route path="/request-form" element={<RequestFormPage />} />
           <Route path="/request/:id" element={<RequestDetailPage />} />
           <Route path="/guide" element={<GuidePage />} />
-          <Route
-            path="/menu"
-            element={
-              <Menu isOpen={true} onClose={() => window.history.back()} />
-            }
-          />
         </Routes>
       </div>
     </Router>
