@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 const SearchBar = ({ onSearch }) => {
-  const [keyword, setKeyword] = useState('');
+  const [keyword, setKeyword] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -11,27 +11,27 @@ const SearchBar = ({ onSearch }) => {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="w-670 bg-white rounded-full shadow-md flex items-center p-2"
-    >
+    <form onSubmit={handleSubmit} className="searchInput">
       <div className="p-1">
         <span role="img" aria-label="orange">
           🍊
         </span>
       </div>
-      <div className="search-container" style={{ 
-        width: 'calc(100% - 20px)', 
-        maxWidth: '100%',
-        margin: '0 auto',
-        boxSizing: 'border-box'
-      }}>
+      <div
+        className="search-container"
+        style={{
+          width: "calc(100% - 20px)",
+          maxWidth: "100%",
+          margin: "0 auto",
+          boxSizing: "border-box",
+        }}
+      >
         <input
           type="text"
           placeholder="찾으시는 주소 입력해주세요"
-          style={{ 
-            width: '100%', 
-            boxSizing: 'border-box' 
+          style={{
+            width: "100%",
+            boxSizing: "border-box",
           }}
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
