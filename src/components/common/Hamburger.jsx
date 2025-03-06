@@ -7,10 +7,10 @@ const Hamburger = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="hamburger">
-      <button onClick={() => setIsDropdownOpen(!isDropdownOpen)} className="hamburgerIcon">
-  <img src={hamburgerIcon} className="hamburgerSVG" />
-</button>
+    <div className="hamburger"onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
+      <button className="hamburgerIcon">
+        <img src={hamburgerIcon} className="hamburgerSVG" />
+      </button>
 {isDropdownOpen && (
   <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg overflow-hidden z-100">
     <button
