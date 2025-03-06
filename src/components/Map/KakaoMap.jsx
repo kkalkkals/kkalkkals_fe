@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { Map, MapMarker, CustomOverlayMap } from 'react-kakao-maps-sdk';
-
-// kakao 객체를 window에서 가져오기
-const { kakao } = window;
+import React, { useEffect, useState } from "react";
+import { Map, MapMarker, CustomOverlayMap } from "react-kakao-maps-sdk";
+import axios from "axios";
 
 const KakaoMap = () => {
   const [center, setCenter] = useState({ lat: 33.450701, lng: 126.570667 });
@@ -10,13 +8,14 @@ const KakaoMap = () => {
   const [level, setLevel] = useState(3);
   const [selectedFacility, setSelectedFacility] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [facilities, setFacilities] = useState([]); // 마커 데이터
 
   // 카카오맵 SDK 로딩 확인
   useEffect(() => {
     if (window.kakao && window.kakao.maps) {
       setIsLoaded(true);
     } else {
-      const script = document.createElement('script');
+      const script = document.createElement("script");
       script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=d1241f131f0caf553d6220f38c7567e1&libraries=services,clusterer`;
       script.async = true;
       script.onload = () => setIsLoaded(true);
@@ -34,43 +33,51 @@ const KakaoMap = () => {
           setCenter({ lat: latitude, lng: longitude });
         },
         (error) => {
-          console.error('Error getting current position:', error);
+          console.error("Error getting current position:", error);
         }
       );
     }
   }, []);
 
-  // 시설 데이터 (클린하우스, 재활용도움센터 등)
-  const facilityData = [
-    {
-      id: 1,
-      type: 'cleanhouse',
-      name: '클린하우스',
-      address: '제주특별자치도 제주시 한림읍 대림리 1298-1',
-      operationHours: '16:00 ~ 04:00',
-      position: { lat: 33.450701, lng: 126.570667 },
-    },
-    {
-      id: 2,
-      type: 'recycling',
-      name: '재활용도움센터',
-      address: '제주특별자치도 제주시 한림읍 대림리 1298-1',
-      operationHours: '07:00 ~ 22:00',
-      position: { lat: 33.452564, lng: 126.574041 },
-    },
-  ];
+  // 지도 바운더리가 변경될 때 API 요청
+  const fetchFacilities = async (bounds) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:80/api/locations/bounds/?minLat=${bounds.swLat}&maxLat=${bounds.neLat}&minLng=${bounds.swLng}&maxLng=${bounds.neLng}`
+      );
+      setFacilities(response.data.data);
+    } catch (error) {
+      console.error("Error fetching facilities:", error);
+    }
+  };
+
+  // 지도 이동 시 바운더리 변경 감지
+  const handleBoundsChanged = (map) => {
+    const bounds = map.getBounds();
+    const sw = bounds.getSouthWest(); // 남서쪽 좌표
+    const ne = bounds.getNorthEast(); // 북동쪽 좌표
+
+    const newBounds = {
+      swLat: sw.getLat(),
+      swLng: sw.getLng(),
+      neLat: ne.getLat(),
+      neLng: ne.getLng(),
+    };
+
+    fetchFacilities(newBounds);
+  };
 
   // 마커 아이콘 설정
   const getMarkerImage = (type) => {
     switch (type) {
-      case 'cleanhouse':
+      case "cleanhouse":
         return {
-          src: 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png',
+          src: "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
           size: { width: 24, height: 35 },
         };
-      case 'recycling':
+      case "recycling":
         return {
-          src: 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png',
+          src: "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png",
           size: { width: 24, height: 35 },
         };
       default:
@@ -79,7 +86,11 @@ const KakaoMap = () => {
   };
 
   if (!isLoaded) {
-    return <div className="w-full h-full flex items-center justify-center">지도 로딩 중...</div>;
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        지도 로딩 중...
+      </div>
+    );
   }
 
   return (
@@ -87,14 +98,15 @@ const KakaoMap = () => {
       <Map
         center={center}
         level={level}
-        style={{ width: '100%', height: '100vh' }}
+        style={{ width: "100%", height: "100vh" }}
         onZoomChanged={(map) => setLevel(map.getLevel())}
+        onBoundsChanged={handleBoundsChanged} // 지도 이동 시 바운더리 변경 감지
       >
         {/* 시설 마커 */}
-        {facilityData.map((facility) => (
+        {facilities.map((facility) => (
           <MapMarker
             key={facility.id}
-            position={facility.position}
+            position={{ lat: facility.latitude, lng: facility.longitude }}
             image={getMarkerImage(facility.type)}
             onClick={() => setSelectedFacility(facility)}
           />
@@ -112,12 +124,18 @@ const KakaoMap = () => {
 
         {/* 선택된 시설 정보 표시 */}
         {selectedFacility && (
-          <CustomOverlayMap position={selectedFacility.position} yAnchor={1.5}>
+          <CustomOverlayMap
+            position={{
+              lat: selectedFacility.latitude,
+              lng: selectedFacility.longitude,
+            }}
+            yAnchor={1.5}
+          >
             <div className="p-3 bg-white rounded-lg shadow-md">
               <h3 className="font-bold text-lg">{selectedFacility.name}</h3>
               <p className="text-sm">{selectedFacility.address}</p>
               <p className="text-sm">
-                운영시간: {selectedFacility.operationHours}
+                운영시간: {selectedFacility.operation_hours}
               </p>
             </div>
           </CustomOverlayMap>
