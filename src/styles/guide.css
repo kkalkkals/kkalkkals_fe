@@ -1,15 +1,118 @@
 /* GuidePage.css */
 
 .guide-container {
+  position: relative;
+  max-width: 430px;
+  margin: 0 auto;
   min-height: 100vh;
-  background-color: #f9fafb;
+  background: transparent;
+  box-sizing: border-box;
+}
+
+.guide-header {
+  margin: 20px 0 32px;
+  text-align: center;
+}
+
+.guide-title {
+  font-family: 'Dongle', 'Noto Sans KR', sans-serif;
+  font-size: 32px;
+  color: #476582;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.guide-subtitle {
+  font-family: 'Dongle', 'Noto Sans KR', sans-serif;
+  font-size: 18px;
+  color: #64748B;
 }
 
 .guide-content {
-  padding: 1rem;
+  padding: 76px 20px 20px;
+  max-width: 100%;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 24px;
+}
+
+.guide-section {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(164, 217, 243, 0.15);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(164, 217, 243, 0.1);
+}
+
+.guide-section:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(164, 217, 243, 0.25);
+}
+
+.section-title {
+  font-family: 'Dongle', 'Noto Sans KR', sans-serif;
+  font-size: 28px;
+  color: #476582;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+.section-content {
+  font-family: 'Dongle', 'Noto Sans KR', sans-serif;
+  font-size: 20px;
+  color: #64748B;
+  line-height: 1.6;
+}
+
+.guide-image {
+  width: 100%;
+  border-radius: 12px;
+  margin: 16px 0;
+}
+
+.guide-list {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0;
+}
+
+.guide-list-item {
+  font-family: 'Dongle', 'Noto Sans KR', sans-serif;
+  font-size: 20px;
+  color: #64748B;
+  margin-bottom: 12px;
+  padding-left: 24px;
+  position: relative;
+}
+
+.guide-list-item::before {
+  content: '•';
+  position: absolute;
+  left: 8px;
+  color: #A4D9F3;
+}
+
+.guide-button {
+  background: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 16px;
+  font-family: 'Dongle', 'Noto Sans KR', sans-serif;
+  font-size: 20px;
+  color: #476582;
+  box-shadow: 0 4px 20px rgba(164, 217, 243, 0.15);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-block;
+  margin-top: 16px;
+}
+
+.guide-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(164, 217, 243, 0.25);
+  background: #F8FAFC;
 }
 
 .info-card {
