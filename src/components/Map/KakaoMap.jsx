@@ -12,6 +12,13 @@ const KakaoMap = () => {
   const [selectedFacility, setSelectedFacility] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [facilities, setFacilities] = useState([]); // 마커 데이터
+  const [pickupRequests, setPickupRequests] = useState([]); // 배출 대행 요청 데이터 추가
+
+  const [selectedRequest, setSelectedRequest] = useState(null);
+  const [selectedRequestGroup, setSelectedRequestGroup] = useState(null); // 같은 위치 요청 그룹
+  
+  const [showFacilities, setShowFacilities] = useState(true);  // 클린하우스, 재활용센터 보기 여부
+  const [showPickupRequests, setShowPickupRequests] = useState(true);  // 배출 대행 요청 보기 여부
 
   const goormSquare = { lat: 33.487182768, lng: 126.531717176 };
 
@@ -55,7 +62,6 @@ const KakaoMap = () => {
         );
         
         // 지도 이동 (패닝 애니메이션 적용)
-        // mapRef.current.panTo(moveLatLng);
         mapRef.current.setCenter(moveLatLng);
         mapRef.current.setLevel(3);
         
@@ -84,14 +90,16 @@ const KakaoMap = () => {
     const ne = bounds.getNorthEast(); // 북동쪽 좌표
 
     const newBounds = {
-      swLat: sw.getLat(),
-      swLng: sw.getLng(),
-      neLat: ne.getLat(),
-      neLng: ne.getLng(),
+        swLat: sw.getLat(),
+        swLng: sw.getLng(),
+        neLat: ne.getLat(),
+        neLng: ne.getLng(),
     };
 
-    fetchFacilities(newBounds);
-  };
+    if (showFacilities) fetchFacilities(newBounds); // 클린하우스, 재활용센터 데이터 가져오기
+    if (showPickupRequests) fetchPickupRequests(newBounds); // 배출 대행 요청 데이터 가져오기
+};
+
 
   // 마커 아이콘 설정 (시설 유형에 따라 구분)
 const getMarkerImage = (type) => {
@@ -116,6 +124,26 @@ const getMarkerImage = (type) => {
     mapRef.current = map;
   };
 
+  const handleKakaoMap = (e) => {
+    console.log(selectedFacility);
+    if (!selectedFacility || !currentPosition) {
+      alert("현재 위치 또는 선택한 시설 정보가 없습니다.");
+      return;
+    }
+
+    // 도착지 이름
+    const destinationName = selectedFacility.name || (selectedFacility.type === "cleanhouse" ? "클린하우스" : "재활용도움센터");
+    
+    // 도착지 좌표
+    const destinationX = selectedFacility.longitude;
+    const destinationY = selectedFacility.latitude;
+
+    const kakaoMapUrl = `https://map.kakao.com/link/to/${destinationName},${destinationY},${destinationX}`;
+    console.log(kakaoMapUrl);
+    // 새 창에서 카카오맵 열기
+    window.open(kakaoMapUrl, '_blank');
+  };
+
   if (!isLoaded) {
     return (
       <div className="w-full h-full flex items-center justify-center">
@@ -123,6 +151,48 @@ const getMarkerImage = (type) => {
       </div>
     );
   }
+
+const fetchPickupRequests = async (bounds) => {
+  try {
+      const response = await axios.get(
+          `http://3.37.88.60/api/pickup/active/bounds?minLat=${bounds.swLat}&maxLat=${bounds.neLat}&minLng=${bounds.swLng}&maxLng=${bounds.neLng}`
+      );
+      setPickupRequests(response.data.data);
+  } catch (error) {
+      console.error("Error fetching pickup requests:", error);
+  }
+};
+
+// 같은 위치에 있는 요청을 그룹화
+const groupedPickupRequests = pickupRequests.reduce((acc, request) => {
+  const key = `${request.latitude}-${request.longitude}`;
+  if (!acc[key]) acc[key] = [];
+  acc[key].push(request);
+  return acc;
+}, {});
+
+// 마커 클릭 시 해당 위치의 모든 요청을 표시
+const handleRequestMarkerClick = (lat, lng) => {
+  const key = `${lat}-${lng}`;
+  const requests = groupedPickupRequests[key];
+
+  if (requests.length > 1) {
+      // 같은 위치의 요청이 여러 개 있는 경우
+      setSelectedRequestGroup(requests);
+      setSelectedRequest(null);
+  } else {
+      // 단일 요청일 경우
+      setSelectedRequest(requests[0]);
+      setSelectedRequestGroup(null);
+  }
+};
+
+// 지도 클릭 시 오버레이 닫기
+const handleMapClick = () => {
+  setSelectedRequest(null);
+  setSelectedRequestGroup(null);
+};
+
 
   return (
     <div className="w-full h-full">
@@ -133,6 +203,7 @@ const getMarkerImage = (type) => {
         onZoomChanged={(map) => setLevel(map.getLevel())}
         onBoundsChanged={handleBoundsChanged} // 지도 이동 시 바운더리 변경 감지
         onCreate={setMapInstance}
+        onClick={handleMapClick}
       >
 
         <MarkerClusterer
@@ -158,8 +229,7 @@ const getMarkerImage = (type) => {
               key={facility.id}
               position={{ lat: facility.latitude, lng: facility.longitude }}
               image={getMarkerImage(facility.type)}
-              onClick={() => setSelectedFacility(facility)}
-            />
+              onClick={() => setSelectedFacility(facility)}/>
           ))}
         </MarkerClusterer>
 
@@ -167,6 +237,9 @@ const getMarkerImage = (type) => {
         {currentPosition && (
           <CustomOverlayMap position={currentPosition}>
             <div className="relative">
+              {/* <div style={{ padding: "5px", color: "black", backgroundColor: "white", borderRadius: "16px" }}>
+                {"현재 내 위치"}
+              </div> */}
               <div className="w-6 h-6 bg-red-400 rounded-full opacity-70 animate-pulse"></div>
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-red-500 rounded-full"></div>
             </div>
@@ -182,15 +255,31 @@ const getMarkerImage = (type) => {
             }}
             yAnchor={1.5}
           >
-            <div className="p-3 bg-white rounded-lg shadow-md">
-              <h3 className="font-bold text-lg">
+            <div className="p-3 bg-white rounded-lg shadow-md text-center">
+              <h3 className="font-bold text-md mb-2">
                 {selectedFacility.type === "cleanhouse" ? "📍 클린하우스" : "📍 재활용도움센터"}
               </h3>
-              <p className="text-sm">{selectedFacility.address}</p>
-              <p className="text-sm">운영시간: {selectedFacility.operation_hours}</p>
+              <p className="text-xs">{selectedFacility.address}</p>
+              <p className="text-xs">운영 시간: {selectedFacility.operation_hours}</p>
+              <button className='bg-yellow-400 text-white px-2 py-1 rounded-md text-xs mt-2 font-bold' onClick={handleKakaoMap}>카카오로 길찾기</button>
             </div>
           </CustomOverlayMap>
         )}
+
+        {/* 배출 대행 요청 마커 */}
+        {showPickupRequests &&
+            Object.values(groupedPickupRequests).map((group) => (
+                <MapMarker
+                    key={`${group[0].latitude}-${group[0].longitude}`}
+                    position={{ lat: group[0].latitude, lng: group[0].longitude }}
+                    image={{
+                        src: "/images/marker-red.png",  // 배출 요청 마커 아이콘
+                        size: { width: 24, height: 35 },
+                    }}
+                    onClick={() => handleRequestMarkerClick(group[0].latitude, group[0].longitude)}
+                />
+            ))
+        }
       </Map>
 
       {/* 현재 위치로 이동 버튼 */}

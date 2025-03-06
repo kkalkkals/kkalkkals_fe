@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import Header from "../components/common/Header";
 import Modal from "../components/common/Modal"; // 모달 추가
 import RequestCard from "../components/request/RequestCard"; // RequestCard 적용
@@ -9,7 +8,6 @@ import axios from "axios";
 const API_URL = "http://3.37.88.60:80/posts/all"; // 백엔드 API 주소
 
 const RequestListPage = () => {
-  const navigate = useNavigate();
   const [requests, setRequests] = useState([]);
   const [filter, setFilter] = useState("최신순");
   const [showCompleted, setShowCompleted] = useState(false);
@@ -134,7 +132,7 @@ const RequestListPage = () => {
       <div className="list-content">
         <div className="filter-bar">
           <button
-            onClick={() => navigate('/request-form')}
+            // onClick={() => navigate('/request-form')}
             className="create-request-button"
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -203,8 +201,6 @@ const RequestListPage = () => {
         onConfirm={handleCompleteConfirm}
         variant="primary"
       />
-
-      {/* <TabMenu activeTab="request-list" /> */}
     </div>
   );
 };
