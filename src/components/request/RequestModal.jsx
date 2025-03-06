@@ -1,6 +1,14 @@
 import React from "react";
+import { useNavigate } from "react-router-dom"; // ✅ useNavigate 추가
 
 const RequestModal = ({ requests, onClose }) => {
+  const navigate = useNavigate(); // ✅ 네비게이션 훅 사용
+
+  // 상세보기 클릭 시 이동하는 함수
+  const handleCardClick = (id) => {
+    navigate(`/request/${id}`); // ✅ request.id를 사용하여 이동
+  };
+
   return (
     <div 
       className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
@@ -29,7 +37,7 @@ const RequestModal = ({ requests, onClose }) => {
               </div>
               <button 
                 className="bg-[#FFF3EE] text-[#FF6B6B] text-xs py-1 px-3 rounded-md whitespace-nowrap hover:bg-[#FFE3D5]"
-                onClick={() => window.location.href = `/request/${request.post_id}`}
+                onClick={() => handleCardClick(request.post_id)} // ✅ request.id로 이동
               >
                 상세 보기
               </button>
