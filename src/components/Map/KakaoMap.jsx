@@ -4,6 +4,7 @@ import { Map, MapMarker, CustomOverlayMap, MarkerClusterer } from "react-kakao-m
 import axios from "axios";
 
 const KakaoMap = () => {
+  const kakaoApiKey = process.env.REACT_APP_KAKAO_MAP_API_KEY;
   const [center, setCenter] = useState({ lat: 33.450701, lng: 126.570667 });
   const [currentPosition, setCurrentPosition] = useState(null);
   const [level, setLevel] = useState(3);
@@ -17,7 +18,7 @@ const KakaoMap = () => {
       setIsLoaded(true);
     } else {
       const script = document.createElement("script");
-      script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=d1241f131f0caf553d6220f38c7567e1&libraries=services,clusterer`;
+      script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoApiKey}&libraries=services,clusterer`;
       script.async = true;
       script.onload = () => setIsLoaded(true);
       document.head.appendChild(script);
