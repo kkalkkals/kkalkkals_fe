@@ -8,7 +8,7 @@
   transform: translateX(-50%);
   width: 100%;
   max-width: 430px;
-  height: 56px;
+  height: 48px;
   background: rgba(220, 237, 247, 0.45);
   backdrop-filter: blur(8px);
   display: flex;
@@ -31,7 +31,7 @@
   cursor: pointer;
   color: #92b9d8;
   padding: 0;
-  margin-right: 12px;
+  /* margin-right: 12px; */
 }
 
 .back-button svg {
@@ -41,12 +41,13 @@
 
 .header-title {
   font-family: "Dongle", sans-serif;
-  font-size: 24px;
+  font-size: 20px;
   color: #92b9d8;
   font-weight: 500;
   flex: 1;
   text-align: center;
-  margin-right: 44px;
+
+  /* margin-right: 44px; */
 }
 
 /* 컨테이너 여백 조정 */
