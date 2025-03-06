@@ -1,9 +1,8 @@
-// src/pages/RequestListPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/common/Header';
 import TabMenu from '../components/tabs/TabMenu';
-import './RequestListPage.css';
+import '../styles/requestList.css';
 
 // 임시 데이터
 const dummyRequests = [

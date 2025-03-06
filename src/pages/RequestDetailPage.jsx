@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Header from '../components/common/Header';
 import Button from '../components/common/Button';
 import Modal from '../components/common/Modal';
-import './RequestDetailPage.css';
+import '../styles/requestDetail.css';
 
 const RequestDetailPage = () => {
   const { id } = useParams();

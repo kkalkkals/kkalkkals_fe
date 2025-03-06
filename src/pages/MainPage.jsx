@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import KakaoMap from '../components/Map/KakaoMap';
 import SearchBar from '../components/Map/SearchBar';
 import Menu from '../components/common/Menu';
-import './MainPage.css';
+import '../styles/main.css';
 
 const MainPage = () => {
   const [searchKeyword, setSearchKeyword] = useState('');
