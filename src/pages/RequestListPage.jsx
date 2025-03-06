@@ -4,6 +4,7 @@ import Header from "../components/common/Header";
 import Modal from "../components/common/Modal"; // 모달 추가
 import RequestCard from "../components/request/RequestCard"; // RequestCard 적용
 import "../styles/requestList.css";
+import axios from "axios";
 
 const API_URL = "http://3.37.88.60:80/posts/all"; // 백엔드 API 주소
 
@@ -20,41 +21,41 @@ const RequestListPage = () => {
   const [selectedRequestId, setSelectedRequestId] = useState(null);
 
   useEffect(() => {
-    const fetchRequests = async () => {
-      try {
-        const response = await fetch(API_URL);
-        const data = await response.json();
-
-        console.log("Fetched Data:", data);
-
-        if (!data.data || !Array.isArray(data.data)) {
-          throw new Error("API 응답이 예상과 다릅니다.");
-        }
-
-        const formattedRequests = data.data.map((post) => ({
-          id: post.post_id,
-          date: new Date(post.date).toISOString().split("T")[0], // 날짜 변환
-          status:
-            post.status === 0
-              ? "요청중"
-              : post.status === 1
-                ? "수거중"
-                : "완료됨",
-          trashType: post.trash_type,
-          trashAmount: `${post.trash_amount}L`,
-          location: post.address,
-          requestDetails: post.request_term || "요청사항 없음",
-          image: "http://3.37.88.60/" + post.image,
-        }));
-
-        setRequests(formattedRequests);
-      } catch (error) {
-        console.error("Error fetching posts:", error);
-      }
-    };
-
     fetchRequests();
   }, []);
+
+  const fetchRequests = async () => {
+    try {
+      const response = await fetch(API_URL);
+      const data = await response.json();
+
+      console.log("Fetched Data:", data);
+
+      if (!data.data || !Array.isArray(data.data)) {
+        throw new Error("API 응답이 예상과 다릅니다.");
+      }
+
+      const formattedRequests = data.data.map((post) => ({
+        id: post.post_id,
+        date: new Date(post.date).toISOString().split("T")[0], // 날짜 변환
+        status:
+          post.status === 0
+            ? "요청중"
+            : post.status === 1
+              ? "수거중"
+              : "완료됨",
+        trashType: post.trash_type,
+        trashAmount: `${post.trash_amount}L`,
+        location: post.address,
+        requestDetails: post.request_term || "요청사항 없음",
+        image: "http://3.37.88.60/" + post.image,
+      }));
+
+      setRequests(formattedRequests);
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+    }
+  };
 
   // 필터링된 요청 목록
   const filteredRequests = () => {
@@ -94,6 +95,7 @@ const RequestListPage = () => {
   // 요청 수락 처리
   const handleAcceptConfirm = () => {
     console.log(`요청 ${selectedRequestId} 수락`);
+    statusApi(selectedRequestId);
     // TODO: 백엔드 API에 요청 수락 로직 추가
     closeAcceptModal();
   };
@@ -101,8 +103,27 @@ const RequestListPage = () => {
   // 대행 완료 처리
   const handleCompleteConfirm = () => {
     console.log(`요청 ${selectedRequestId} 대행 완료`);
+    statusApi(selectedRequestId);
     // TODO: 백엔드 API에 대행 완료 요청 추가
     closeCompletedModal();
+  };
+
+  const statusApi = async (requestId) => {
+    try {
+      // axios로 POST 요청 보내기
+      const response = await axios.patch(
+        `http://3.37.88.60/api/pickup/status/${requestId}`
+      );
+
+      // 성공적인 응답 처리
+      console.log("File uploaded successfully", response);
+
+      fetchRequests();
+    } catch (error) {
+      // 에러 처리
+      console.error("Error uploading file", error);
+    } finally {
+    }
   };
 
   return (
