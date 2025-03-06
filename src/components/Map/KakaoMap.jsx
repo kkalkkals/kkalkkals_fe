@@ -55,7 +55,6 @@ const KakaoMap = () => {
         );
         
         // 지도 이동 (패닝 애니메이션 적용)
-        // mapRef.current.panTo(moveLatLng);
         mapRef.current.setCenter(moveLatLng);
         mapRef.current.setLevel(3);
         
@@ -116,6 +115,38 @@ const getMarkerImage = (type) => {
     mapRef.current = map;
   };
 
+  const handleKakaoMap = (e) => {
+    if (!selectedFacility || !currentPosition) {
+      alert("현재 위치 또는 선택한 시설 정보가 없습니다.");
+      return;
+    }
+
+    // 도착지 이름
+    const destinationName = selectedFacility.name || (selectedFacility.type === "cleanhouse" ? "클린하우스" : "재활용도움센터");
+    
+    // 도착지 좌표
+    const destinationX = selectedFacility.longitude;
+    const destinationY = selectedFacility.latitude;
+    
+    // 출발지 좌표
+    const startX = currentPosition.lng;
+    const startY = currentPosition.lat;
+    
+    // 카카오맵 길찾기 URL 생성
+    // sX, sY: 출발지 좌표(경도, 위도)
+    // eX, eY: 도착지 좌표(경도, 위도)
+    // 카카오맵은 x가 경도, y가 위도를 의미함
+    // const kakaoMapUrl = `https://map.kakao.com/link/to/${destinationName},${destinationY},${destinationX}/from/${startY},${startX}/route`;
+    const kakaoMapUrl = `https://map.kakao.com/link/to/${destinationName},${destinationY},${destinationX}`;
+    // 새 창에서 카카오맵 열기
+    window.open(kakaoMapUrl, '_blank');
+  };
+
+  // const handleMapClick = (map, mouseEvent) => {
+  //   // 선택된 시설 정보 초기화
+  //   setSelectedFacility(null);
+  // };
+
   if (!isLoaded) {
     return (
       <div className="w-full h-full flex items-center justify-center">
@@ -123,6 +154,7 @@ const getMarkerImage = (type) => {
       </div>
     );
   }
+
 
   return (
     <div className="w-full h-full">
@@ -158,8 +190,7 @@ const getMarkerImage = (type) => {
               key={facility.id}
               position={{ lat: facility.latitude, lng: facility.longitude }}
               image={getMarkerImage(facility.type)}
-              onClick={() => setSelectedFacility(facility)}
-            />
+              onClick={() => setSelectedFacility(facility)}/>
           ))}
         </MarkerClusterer>
 
@@ -167,6 +198,9 @@ const getMarkerImage = (type) => {
         {currentPosition && (
           <CustomOverlayMap position={currentPosition}>
             <div className="relative">
+              {/* <div style={{ padding: "5px", color: "black", backgroundColor: "white", borderRadius: "16px" }}>
+                {"현재 내 위치"}
+              </div> */}
               <div className="w-6 h-6 bg-red-400 rounded-full opacity-70 animate-pulse"></div>
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-red-500 rounded-full"></div>
             </div>
@@ -182,12 +216,13 @@ const getMarkerImage = (type) => {
             }}
             yAnchor={1.5}
           >
-            <div className="p-3 bg-white rounded-lg shadow-md">
-              <h3 className="font-bold text-lg">
+            <div className="p-3 bg-white rounded-lg shadow-md text-center">
+              <h3 className="font-bold text-md mb-2">
                 {selectedFacility.type === "cleanhouse" ? "📍 클린하우스" : "📍 재활용도움센터"}
               </h3>
-              <p className="text-sm">{selectedFacility.address}</p>
-              <p className="text-sm">운영시간: {selectedFacility.operation_hours}</p>
+              <p className="text-xs">{selectedFacility.address}</p>
+              <p className="text-xs">운영 시간: {selectedFacility.operation_hours}</p>
+              <button className='bg-yellow-400 text-white px-2 py-1 rounded-md text-xs mt-2 font-bold' onClick={handleKakaoMap}>카카오로 길찾기</button>
             </div>
           </CustomOverlayMap>
         )}
