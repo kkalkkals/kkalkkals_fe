@@ -307,6 +307,7 @@ const closeModal = () => {
 
 // 지도 클릭 시 오버레이 닫기
 const handleMapClick = () => {
+  setSelectedFacility(null); // 선택된 시설 정보 초기화
   setSelectedRequest(null);
   setSelectedRequestGroup(null);
 };
