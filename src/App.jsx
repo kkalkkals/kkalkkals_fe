@@ -7,9 +7,10 @@ import RequestFormPage from "./pages/RequestFormPage";
 import RequestDetailPage from "./pages/RequestDetailPage";
 import LoginPage from "./pages/LoginPage";
 import GuidePage from "./pages/GuidePage";
-
+import "./App.css";
 const App = () => {
   return (
+    <div className="App">
     <Router>
       <div className="max-w-md mx-auto min-h-screen bg-gray-50 overflow-x-hidden">
         <Routes>
@@ -24,6 +25,7 @@ const App = () => {
         </Routes>
       </div>
     </Router>
+    </div>
   );
 };
 
