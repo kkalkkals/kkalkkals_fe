@@ -6,7 +6,7 @@ const SearchBar = ({ onSearch, districts, onDistrictSelect }) => {
   const [showResults, setShowResults] = useState(false);
 
   useEffect(() => {
-    if (keyword.trim() === '') {
+    if (keyword.trim() === "") {
       setSearchResults([]);
       setShowResults(false);
       return;
@@ -14,10 +14,10 @@ const SearchBar = ({ onSearch, districts, onDistrictSelect }) => {
 
     // 검색어에 맞는 동네 필터링
     if (districts) {
-      const filtered = districts.filter(district => 
+      const filtered = districts.filter((district) =>
         district.name.toLowerCase().includes(keyword.toLowerCase())
       );
-      
+
       setSearchResults(filtered);
       setShowResults(filtered.length > 0);
     }
@@ -56,10 +56,10 @@ const SearchBar = ({ onSearch, districts, onDistrictSelect }) => {
         >
           <input
             type="text"
-            placeholder="제주도 읍면동 검색..."
+            placeholder="제주도 읍면동을 검색해주세요"
             style={{
               width: "100%",
-              borderRadius: "12px",
+              // borderRadius: "12px",
             }}
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
@@ -80,7 +80,7 @@ const SearchBar = ({ onSearch, districts, onDistrictSelect }) => {
           </svg>
         </button>
       </form>
-      
+
       {showResults && (
         <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg max-h-60 overflow-y-auto z-50">
           {searchResults.map((district, index) => (
