@@ -192,7 +192,7 @@ const KakaoMap = () => {
   const fetchFacilities = async (bounds) => {
     try {
       const response = await axios.get(
-        `http://3.37.88.60/api/locations/bounds/?minLat=${bounds.swLat}&maxLat=${bounds.neLat}&minLng=${bounds.swLng}&maxLng=${bounds.neLng}`
+        `http://localhost:80/api/locations/bounds/?minLat=${bounds.swLat}&maxLat=${bounds.neLat}&minLng=${bounds.swLng}&maxLng=${bounds.neLng}`
       );
       setFacilities(response.data.data);
     } catch (error) {
@@ -272,7 +272,7 @@ const getMarkerImage = (type) => {
 const fetchPickupRequests = async (bounds) => {
   try {
       const response = await axios.get(
-          `http://3.37.88.60/api/pickup/active/bounds?minLat=${bounds.swLat}&maxLat=${bounds.neLat}&minLng=${bounds.swLng}&maxLng=${bounds.neLng}`
+          `http://localhost:80/api/pickup/active/bounds?minLat=${bounds.swLat}&maxLat=${bounds.neLat}&minLng=${bounds.swLng}&maxLng=${bounds.neLng}`
       );
       setPickupRequests(response.data.data);
   } catch (error) {
@@ -456,7 +456,7 @@ const handleDistrictSelect = (district) => {
                   position={{ lat: firstRequest.latitude, lng: firstRequest.longitude }}
                   image={{
                     src: "/images/marker-red.png",
-                    size: { width: 24, height: 35 },
+                    size: { width: 22, height: 24 },
                   }}
                   onClick={() => handleRequestMarkerClick(firstRequest.latitude, firstRequest.longitude)}
                 />
@@ -514,9 +514,14 @@ const handleDistrictSelect = (district) => {
               btn.state ? "bg-white" : "bg-gray-300 opacity-50"
             }`}
           >
-            <img src={btn.img} alt={btn.name} className="w-6 h-6" />
+          <img
+            src={btn.img}
+            alt={btn.name}
+            className="w-6 h-6 object-contain"
+          />
           </button>
         ))}
+
 
         {/* 현재 위치 버튼 */}
         <button
