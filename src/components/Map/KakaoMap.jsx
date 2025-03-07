@@ -244,11 +244,13 @@ const KakaoMap = () => {
   };
 
   const handleKakaoMap = (e) => {
-    console.log(selectedFacility);
-    if (!selectedFacility || !currentPosition) {
+    if (!selectedFacility) {
       alert("현재 위치 또는 선택한 시설 정보가 없습니다.");
       return;
     }
+
+    // 디버깅을 위한 로그 추가
+    console.log("Selected facility:", JSON.stringify(selectedFacility));
 
     // 도착지 이름
     const destinationName =
@@ -257,12 +259,18 @@ const KakaoMap = () => {
         ? "클린하우스"
         : "재활용도움센터");
 
-    // 도착지 좌표
-    const destinationX = selectedFacility.longitude;
-    const destinationY = selectedFacility.latitude;
+    // 도착지 좌표 - 명확한 이름으로 변수 재정의
+    const longitude = selectedFacility.longitude;
+    const latitude = selectedFacility.latitude;
 
-    const kakaoMapUrl = `https://map.kakao.com/link/to/${destinationName},${destinationY},${destinationX}`;
-    console.log(kakaoMapUrl);
+    console.log(
+      `Name: ${destinationName}, Coordinates: lat=${latitude}, lng=${longitude}`
+    );
+
+    // 카카오맵 URL 형식: 위치명,위도,경도 순서
+    const kakaoMapUrl = `https://map.kakao.com/link/to/${destinationName},${latitude},${longitude}`;
+    console.log("Generated URL:", kakaoMapUrl);
+
     // 새 창에서 카카오맵 열기
     window.open(kakaoMapUrl, "_blank");
   };
@@ -312,14 +320,13 @@ const KakaoMap = () => {
 
   // 지도 클릭 시 오버레이 닫기
   const handleMapClick = () => {
-    setSelectedFacility(null); // 선택된 시설 정보 초기화
+    // setSelectedFacility(null); //
     setSelectedRequest(null);
     setSelectedRequestGroup(null);
   };
 
   // 검색어 변경 핸들러
-  const handleSearchChange = (e) => {
-    const value = e.target.value;
+  const handleSearchChange = (value) => {
     setSearchTerm(value);
 
     if (value.trim() === "") {
@@ -334,7 +341,7 @@ const KakaoMap = () => {
     );
 
     setSearchResults(filtered);
-    setShowSearchResults(true);
+    setShowSearchResults(filtered.length > 0);
   };
 
   // 동네 선택 핸들러
@@ -351,6 +358,7 @@ const KakaoMap = () => {
 
       setCenter({ lat: district.lat, lng: district.lng });
       setLevel(district.level);
+      setSelectedFacility(null);
     }
 
     // 검색 UI 초기화
@@ -360,7 +368,6 @@ const KakaoMap = () => {
 
   return (
     <div className="w-full h-full relative">
-      {/* <div className="absolute flex items-center justify-between top-4 left-1/2 transform -translate-x-1/2 z-10 w-4/5 max-w-md opacity-90"> */}
       <div className="main-header-container">
         <div className="main-header-content">
           <SearchBar
@@ -380,7 +387,6 @@ const KakaoMap = () => {
         onDragEnd={handleMapBoundsLimit} // 드래그 후 제주도 밖으로 못 나가게
         onBoundsChanged={handleBoundsChanged} // 바운드 변경 감지
         onCreate={setMapInstance}
-        onClick={handleMapClick}
       >
         {/* 클린하우스 마커 클러스터링 */}
         {showCleanhouse && (
@@ -462,7 +468,7 @@ const KakaoMap = () => {
                 {
                   width: "40px",
                   height: "40px",
-                  background: "rgba(255, 61, 0, 0.7)", // 연한 빨강
+                  background: "rgba(60, 179, 113, 0.7)",
                   borderRadius: "50%",
                   textAlign: "center",
                   lineHeight: "40px",
@@ -499,8 +505,8 @@ const KakaoMap = () => {
           )}
 
         {/* 현재 위치 마커 */}
-        {currentPosition && (
-          <CustomOverlayMap position={currentPosition}>
+        {goormSquare && (
+          <CustomOverlayMap position={goormSquare}>
             <div className="relative">
               {/* <div style={{ padding: "5px", color: "black", backgroundColor: "white", borderRadius: "16px" }}>
                 {"현재 내 위치"}
@@ -511,6 +517,32 @@ const KakaoMap = () => {
           </CustomOverlayMap>
         )}
 
+        {/* 투명한 오버레이를 지도 전체에 추가 (맵 클릭을 처리하기 위함) */}
+        <CustomOverlayMap
+          position={center}
+          xAnchor={0.5}
+          yAnchor={0.5}
+          zIndex={1} // 낮은 z-index로 다른 요소들 아래에 위치
+        >
+          <div
+            style={{
+              position: "absolute",
+              width: "100vw",
+              height: "100vh",
+              top: "-50vh",
+              left: "-50vw",
+              background: "transparent",
+              pointerEvents: selectedFacility ? "all" : "none", // 시설이 선택된 경우에만 이벤트 처리
+            }}
+            onClick={() => {
+              // 여기서만 오버레이 닫기 처리
+              setSelectedFacility(null);
+              setSelectedRequest(null);
+              setSelectedRequestGroup(null);
+            }}
+          />
+        </CustomOverlayMap>
+
         {/* 선택된 시설 정보 표시 */}
         {selectedFacility && (
           <CustomOverlayMap
@@ -519,8 +551,14 @@ const KakaoMap = () => {
               lng: selectedFacility.longitude,
             }}
             yAnchor={1.5}
+            zIndex={10} // 높은 z-index로 다른 요소들 위에 표시
           >
-            <div className="p-3 bg-white rounded-lg shadow-md text-center">
+            <div
+              className="p-3 bg-white rounded-lg shadow-md text-center"
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
               <h3 className="font-bold text-md mb-2">
                 {selectedFacility.type === "cleanhouse"
                   ? "📍 클린하우스"
@@ -532,9 +570,12 @@ const KakaoMap = () => {
               </p>
               <button
                 className="bg-yellow-400 text-white px-2 py-1 rounded-md text-xs mt-2 font-bold"
-                onClick={handleKakaoMap}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleKakaoMap();
+                }}
               >
-                카카오로 길찾기
+                카카오맵으로 길찾기
               </button>
             </div>
           </CustomOverlayMap>
