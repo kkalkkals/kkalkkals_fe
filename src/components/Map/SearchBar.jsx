@@ -82,7 +82,7 @@ const SearchBar = ({ onSearch, districts, onDistrictSelect }) => {
       </form>
 
       {showResults && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg max-h-60 overflow-y-auto z-50">
+        <div className="absolute top-full left-3 right-3 mt-2 px-0 bg-white rounded-xl shadow-lg max-h-60 overflow-y-auto z-50">
           {searchResults.map((district, index) => (
             <div
               key={index}
