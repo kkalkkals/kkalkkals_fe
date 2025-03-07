@@ -320,8 +320,7 @@ const handleMapClick = () => {
 };
 
 // 검색어 변경 핸들러
-const handleSearchChange = (e) => {
-  const value = e.target.value;
+const handleSearchChange = (value) => {
   setSearchTerm(value);
   
   if (value.trim() === "") {
@@ -334,14 +333,9 @@ const handleSearchChange = (e) => {
   const filtered = jejuDistricts.filter(district => 
     district.name.toLowerCase().includes(value.toLowerCase())
   );
-  
-  if (filtered.length === 0) {
-    e.target.value = "";
-    return;
-  }
 
   setSearchResults(filtered);
-  setShowSearchResults(true);
+  setShowSearchResults(filtered.length > 0);
 };
 
 // 동네 선택 핸들러
