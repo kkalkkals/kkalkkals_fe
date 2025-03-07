@@ -1,5 +1,20 @@
 .App {
   text-align: center;
+
+  /* 배경 이미지 설정 */
+  background:
+  linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, 0)), 
+  url("/public/images/background.svg");
+
+  /* 배경 컬러 설정 */
+  /* background-color: #ebeeff;  */
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+
+  min-height: 100vh;
 }
 
 .App-logo {
