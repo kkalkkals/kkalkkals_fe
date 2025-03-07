@@ -102,6 +102,7 @@ const RequestFormPage = () => {
       navigate("/request-list");
     } catch (error) {
       console.error("Error creating request:", error);
+      alert("올바른 주소를 입력해주세요.");
     }
   };
 
