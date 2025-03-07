@@ -9,7 +9,16 @@
   position: relative;
   /* padding: 16px; */
 }
+.area1{
+  display: flex;
+  width: 90%;
+}
+.area2{
+  width: 16%;
+  display: flex;
+  /* background-color: aquamarine; */
 
+}
 .search-container {
   z-index: 10;
   display: flex;
@@ -26,6 +35,7 @@
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
+  display: flex;
   width: 100%; /* w-4/5 */
   max-width: 28rem;
   /*max-w-md*/
@@ -52,7 +62,8 @@
 
 .hamburger {
   /* margin-left: 15px; */
-  margin-right: 15px;
+  /* margin-right: 15px; */
+  /* margin: 0; */
   background: white;
   padding: 12px;
   border-radius: 50%;
@@ -62,6 +73,7 @@
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease;
+
 }
 
 .hamburger:hover {

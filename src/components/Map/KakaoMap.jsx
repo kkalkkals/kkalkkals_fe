@@ -394,12 +394,16 @@ const KakaoMap = () => {
     <div className="w-full h-full relative">
       <div className="main-header-container">
         <div className="main-header-content">
-          <SearchBar
-            onSearch={handleSearchChange}
-            districts={jejuDistricts}
-            onDistrictSelect={handleDistrictSelect}
-          />
-          <Hamburger className="opacity-90" />
+          <div className="area1">
+            <SearchBar
+              onSearch={handleSearchChange}
+              districts={jejuDistricts}
+              onDistrictSelect={handleDistrictSelect}
+            />
+          </div>
+          <div className="area2">
+            <Hamburger className="opacity-90" />
+          </div>
         </div>
       </div>
 

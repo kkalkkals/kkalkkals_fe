@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import "../../styles/searchBar.css";
 
 const SearchBar = ({ onSearch, districts, onDistrictSelect }) => {
   const [keyword, setKeyword] = useState("");
@@ -12,7 +13,6 @@ const SearchBar = ({ onSearch, districts, onDistrictSelect }) => {
       return;
     }
 
-    // 검색어에 맞는 동네 필터링
     if (districts) {
       const filtered = districts.filter((district) =>
         district.name.toLowerCase().includes(keyword.toLowerCase())
@@ -39,33 +39,19 @@ const SearchBar = ({ onSearch, districts, onDistrictSelect }) => {
   };
 
   return (
-    <div className="relative">
-      <form onSubmit={handleSubmit} className="searchInput">
-        <div className="p-1">
-          <span role="img" aria-label="orange">
-            🍊
-          </span>
-        </div>
-        <div
-          className="search-container"
-          style={{
-            // width: "calc(100% - 20px)",
-            maxWidth: "100%",
-            margin: "0 auto",
-          }}
-        >
+    <div className="search-wrapper">
+      <form onSubmit={handleSubmit} className="search-form">
+        <div className="search-icon">🍊</div>
+        <div className="search-container">
           <input
             type="text"
             placeholder="제주도 읍면동을 검색해주세요"
-            style={{
-              width: "100%",
-              // borderRadius: "12px",
-            }}
+            className="search-input"
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
           />
         </div>
-        <button type="submit" className="p-1">
+        <button type="submit" className="search-button">
           <svg
             width="20"
             height="20"
@@ -82,11 +68,11 @@ const SearchBar = ({ onSearch, districts, onDistrictSelect }) => {
       </form>
 
       {showResults && (
-        <div className="absolute top-full left-3 right-3 mt-2 px-0 bg-white rounded-xl shadow-lg max-h-60 overflow-y-auto z-50">
+        <div className="search-results">
           {searchResults.map((district, index) => (
             <div
               key={index}
-              className="px-4 py-2 hover:bg-gray-100 rounded-lg cursor-pointer"
+              className="search-result-item"
               onClick={() => handleDistrictClick(district)}
             >
               {district.name}
