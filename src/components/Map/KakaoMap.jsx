@@ -1,38 +1,31 @@
 import React, { useEffect, useRef, useState } from "react";
-import {
-  Map,
-  MapMarker,
-  CustomOverlayMap,
-  MarkerClusterer,
-} from "react-kakao-maps-sdk";
+import { Map, MapMarker, CustomOverlayMap, MarkerClusterer } from "react-kakao-maps-sdk";
 import axios from "axios";
 import SearchBar from "./SearchBar";
-import Hamburger from "../common/Hamburger";
+import Hamburger from '../common/Hamburger';
 import RequestModal from "../request/RequestModal";
 
 const KakaoMap = () => {
   const kakaoApiKey = process.env.REACT_APP_KAKAO_MAP_API_KEY;
   const mapRef = useRef(null);
-  const [center, setCenter] = useState({
-    lat: 33.487182768,
-    lng: 126.531717176,
-  });
-  const [currentPosition, setCurrentPosition] = useState(null);
+  const initialLoadDoneRef = useRef(false);
+  const [center, setCenter] = useState({ lat: 33.487182768, lng: 126.531717176 });
+  // const [currentPosition, setCurrentPosition] = useState(null);
   const [level, setLevel] = useState(3);
   const [selectedFacility, setSelectedFacility] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [facilities, setFacilities] = useState([]); // 마커 데이터
   const [pickupRequests, setPickupRequests] = useState([]); // 배출 대행 요청 데이터 추가
 
-  // 필터 상태
+    // 필터 상태
   const [showCleanhouse, setShowCleanhouse] = useState(true);
   const [showRecycling, setShowRecycling] = useState(true);
   const [showPickupRequests, setShowPickupRequests] = useState(true);
 
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [selectedRequestGroup, setSelectedRequestGroup] = useState(null); // 같은 위치 요청 그룹
-
-  const [showFacilities, setShowFacilities] = useState(true); // 클린하우스, 재활용센터 보기 여부
+  
+  const [showFacilities, setShowFacilities] = useState(true);  // 클린하우스, 재활용센터 보기 여부
   // const [showPickupRequests, setShowPickupRequests] = useState(true);  // 배출 대행 요청 보기 여부
 
   const goormSquare = { lat: 33.487182768, lng: 126.531717176 };
@@ -67,16 +60,16 @@ const KakaoMap = () => {
 
   // 제주도 읍면동 데이터
   const jejuDistricts = [
-    { name: "제주시 한림읍", lat: 33.4089, lng: 126.269, level: 7 },
+    { name: "제주시 한림읍", lat: 33.4089, lng: 126.2690, level: 7 },
     { name: "제주시 애월읍", lat: 33.4631, lng: 126.3312, level: 7 },
     { name: "제주시 구좌읍", lat: 33.5519, lng: 126.7159, level: 7 },
     { name: "제주시 조천읍", lat: 33.5375, lng: 126.6341, level: 7 },
     { name: "제주시 한경면", lat: 33.3435, lng: 126.1726, level: 7 },
     { name: "제주시 추자면", lat: 33.9471, lng: 126.3095, level: 7 },
     { name: "제주시 우도면", lat: 33.5032, lng: 126.9521, level: 7 },
-    { name: "제주시 일도1동", lat: 33.5138, lng: 126.523, level: 5 },
+    { name: "제주시 일도1동", lat: 33.5138, lng: 126.5230, level: 5 },
     { name: "제주시 일도2동", lat: 33.5099, lng: 126.5294, level: 5 },
-    { name: "제주시 이도1동", lat: 33.5099, lng: 126.523, level: 5 },
+    { name: "제주시 이도1동", lat: 33.5099, lng: 126.5230, level: 5 },
     { name: "제주시 이도2동", lat: 33.5001, lng: 126.5294, level: 5 },
     { name: "제주시 삼도1동", lat: 33.5138, lng: 126.5166, level: 5 },
     { name: "제주시 삼도2동", lat: 33.5099, lng: 126.5166, level: 5 },
@@ -91,25 +84,25 @@ const KakaoMap = () => {
     { name: "제주시 연동", lat: 33.4904, lng: 126.5038, level: 5 },
     { name: "제주시 노형동", lat: 33.4825, lng: 126.4806, level: 5 },
     { name: "제주시 외도동", lat: 33.4904, lng: 126.4358, level: 5 },
-    { name: "제주시 이호동", lat: 33.4982, lng: 126.455, level: 5 },
-    { name: "제주시 도두동", lat: 33.506, lng: 126.4614, level: 5 },
+    { name: "제주시 이호동", lat: 33.4982, lng: 126.4550, level: 5 },
+    { name: "제주시 도두동", lat: 33.5060, lng: 126.4614, level: 5 },
     { name: "서귀포시 대정읍", lat: 33.2237, lng: 126.2501, level: 7 },
     { name: "서귀포시 남원읍", lat: 33.2765, lng: 126.7159, level: 7 },
     { name: "서귀포시 성산읍", lat: 33.3826, lng: 126.8806, level: 7 },
     { name: "서귀포시 안덕면", lat: 33.2518, lng: 126.3567, level: 7 },
     { name: "서귀포시 표선면", lat: 33.3264, lng: 126.8231, level: 7 },
     { name: "서귀포시 송산동", lat: 33.2518, lng: 126.5614, level: 5 },
-    { name: "서귀포시 정방동", lat: 33.244, lng: 126.5678, level: 5 },
+    { name: "서귀포시 정방동", lat: 33.2440, lng: 126.5678, level: 5 },
     { name: "서귀포시 중앙동", lat: 33.2518, lng: 126.5678, level: 5 },
-    { name: "서귀포시 천지동", lat: 33.244, lng: 126.5614, level: 5 },
+    { name: "서귀포시 천지동", lat: 33.2440, lng: 126.5614, level: 5 },
     { name: "서귀포시 효돈동", lat: 33.2518, lng: 126.5934, level: 5 },
     { name: "서귀포시 영천동", lat: 33.2596, lng: 126.5742, level: 5 },
     { name: "서귀포시 동홍동", lat: 33.2596, lng: 126.5806, level: 5 },
-    { name: "서귀포시 서홍동", lat: 33.2596, lng: 126.555, level: 5 },
+    { name: "서귀포시 서홍동", lat: 33.2596, lng: 126.5550, level: 5 },
     { name: "서귀포시 대륜동", lat: 33.2518, lng: 126.5486, level: 5 },
     { name: "서귀포시 대천동", lat: 33.2518, lng: 126.5358, level: 5 },
-    { name: "서귀포시 중문동", lat: 33.2518, lng: 126.423, level: 5 },
-    { name: "서귀포시 예래동", lat: 33.2518, lng: 126.3903, level: 5 },
+    { name: "서귀포시 중문동", lat: 33.2518, lng: 126.4230, level: 5 },
+    { name: "서귀포시 예래동", lat: 33.2518, lng: 126.3903, level: 5 }
   ];
 
   // 카카오맵 SDK 로딩 확인
@@ -125,19 +118,49 @@ const KakaoMap = () => {
     }
   }, []);
 
+  // 맨 처음 컴포넌트 마운트 시 한 번만 실행되는 데이터 로딩 로직
   useEffect(() => {
-    if (mapRef.current) {
-      const map = mapRef.current;
-
-      // 제주도 경계 설정 (서남쪽, 동북쪽 좌표)
-      const sw = new window.kakao.maps.LatLng(33.11, 126.05); // 서남쪽
-      const ne = new window.kakao.maps.LatLng(34.0, 127.0); // 동북쪽
-      const jejuBounds = new window.kakao.maps.LatLngBounds(sw, ne);
-
-      // 지도 초기화 시 제주도 영역으로 제한
-      map.setBounds(jejuBounds);
+    // 지도가 로드되었을 때 실행
+    if (isLoaded && !initialLoadDoneRef.current) {
+      console.log("지도 로드됨, 초기 데이터 로딩 시작");
+      
+      // 고정된 구름스퀘어 주변 바운드 (API 호출용)
+      const bounds = {
+        swLat: goormSquare.lat - 0.01,
+        swLng: goormSquare.lng - 0.01,
+        neLat: goormSquare.lat + 0.01,
+        neLng: goormSquare.lng + 0.01
+      };
+      
+      console.log("고정 바운드로 초기 데이터 로딩:", bounds);
+      
+      // API 호출 직접 실행 (Promise.all로 병렬 처리)
+      Promise.all([
+        axios.get(`http://3.37.88.60/api/locations/bounds/?minLat=${bounds.swLat}&maxLat=${bounds.neLat}&minLng=${bounds.swLng}&maxLng=${bounds.neLng}`),
+        axios.get(`http://3.37.88.60/api/pickup/active/bounds?minLat=${bounds.swLat}&maxLat=${bounds.neLat}&minLng=${bounds.swLng}&maxLng=${bounds.neLng}`)
+      ])
+      .then(([facilitiesResponse, pickupResponse]) => {
+        console.log("초기 데이터 로딩 완료:", 
+          facilitiesResponse.data.data.length, "개 시설,", 
+          pickupResponse.data.data.length, "개 요청");
+        
+        setFacilities(facilitiesResponse.data.data);
+        setPickupRequests(pickupResponse.data.data);
+        initialLoadDoneRef.current = true;
+      })
+      .catch(error => {
+        console.error("초기 데이터 로딩 실패:", error);
+      });
     }
-  }, [isLoaded]); // 맵이 로드되었을 때 실행
+  }, [isLoaded]);
+
+  // 별도로 지도 초기화를 위한 useEffect (mapRef에 의존)
+  useEffect(() => {
+    if (mapRef.current && isLoaded) {
+      console.log("지도 객체 초기화 및 중심 설정");
+      moveToGoormSquare();
+    }
+  }, [mapRef.current, isLoaded]);
 
   // // 현재 위치 가져오기 htts에서만 geolocation 이용 가능
   // useEffect(() => {
@@ -161,7 +184,7 @@ const KakaoMap = () => {
 
       // 제주도 경계 설정
       const sw = new window.kakao.maps.LatLng(33.11, 126.05); // 서남쪽
-      const ne = new window.kakao.maps.LatLng(34.0, 127.0); // 동북쪽
+      const ne = new window.kakao.maps.LatLng(34.00, 127.00); // 동북쪽
       const jejuBounds = new window.kakao.maps.LatLngBounds(sw, ne);
 
       // 현재 지도 중심 좌표 확인
@@ -219,6 +242,7 @@ const KakaoMap = () => {
     if (showFacilities) fetchFacilities(newBounds); // 클린하우스, 재활용센터 데이터 가져오기
     if (showPickupRequests) fetchPickupRequests(newBounds); // 배출 대행 요청 데이터 가져오기
   };
+
 
   // 마커 아이콘 설정 (시설 유형에 따라 구분)
   const getMarkerImage = (type) => {
@@ -581,6 +605,7 @@ const KakaoMap = () => {
           </CustomOverlayMap>
         )}
       </Map>
+
       {/* 필터 & 현재 위치 버튼 컨테이너 */}
       <div className="absolute bottom-4 right-4 flex flex-col items-end space-y-3 z-10">
         {/* 필터 버튼들 */}
