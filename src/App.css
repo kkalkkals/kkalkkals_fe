@@ -1,9 +1,11 @@
 .App {
+  background: rgb(255,231,204);
+background: linear-gradient(15deg, rgba(255,231,204,1) 0%, rgba(230,244,251,1) 100%);
   /* text-align: center; */
 
   /* 배경 이미지 설정 */
-  background: linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, 0)),
-    url("/public/images/background.svg");
+  /* background: linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, 0)), */
+    /* url("/public/images/background.svg"); */
 
   /* 배경 컬러 설정 */
   /* background-color: #ebeeff;  */
