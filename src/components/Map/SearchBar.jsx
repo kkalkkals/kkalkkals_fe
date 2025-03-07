@@ -19,7 +19,7 @@ const SearchBar = ({ onSearch, districts, onDistrictSelect }) => {
       );
 
       setSearchResults(filtered);
-      setShowResults(filtered.length > 0);
+      setShowResults(filtered.length > 1);
     }
   }, [keyword, districts]);
 

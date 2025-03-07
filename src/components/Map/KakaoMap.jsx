@@ -483,50 +483,35 @@ const KakaoMap = () => {
         )}
 
         {/* 배출 요청 마커 클러스터링 */}
-        {showPickupRequests &&
-          Object.keys(groupedPickupRequests).length > 0 && (
-            <MarkerClusterer
-              averageCenter
-              minLevel={5}
-              styles={[
-                {
-                  width: "40px",
-                  height: "40px",
-                  background: "rgba(60, 179, 113, 0.7)",
-                  borderRadius: "50%",
-                  textAlign: "center",
-                  lineHeight: "40px",
-                  color: "white",
-                  fontWeight: "bold",
-                  fontSize: "14px",
-                },
-              ]}
-            >
-              {Object.keys(groupedPickupRequests).map((key) => {
-                const requestsAtSameLocation = groupedPickupRequests[key]; // 해당 좌표의 요청들
-                const firstRequest = requestsAtSameLocation[0]; // 대표 요청만 사용
-                return (
-                  <MapMarker
-                    key={key}
-                    position={{
-                      lat: firstRequest.latitude,
-                      lng: firstRequest.longitude,
-                    }}
-                    image={{
-                      src: "/images/marker-red.png",
-                      size: { width: 24, height: 35 },
-                    }}
-                    onClick={() =>
-                      handleRequestMarkerClick(
-                        firstRequest.latitude,
-                        firstRequest.longitude
-                      )
-                    }
-                  />
-                );
-              })}
-            </MarkerClusterer>
-          )}
+        {showPickupRequests && Object.keys(groupedPickupRequests).length > 0 && (
+          <MarkerClusterer
+            averageCenter
+            minLevel={5}
+            styles={[{
+              width: "40px", height: "40px",
+              background: "rgba(255, 61, 0, 0.7)", // 연한 빨강
+              borderRadius: "50%",
+              textAlign: "center", lineHeight: "40px",
+              color: "white", fontWeight: "bold", fontSize: "14px",
+            }]}
+          >
+            {Object.keys(groupedPickupRequests).map((key) => {
+              const requestsAtSameLocation = groupedPickupRequests[key]; // 해당 좌표의 요청들
+              const firstRequest = requestsAtSameLocation[0]; // 대표 요청만 사용
+              return (
+                <MapMarker
+                  key={key}
+                  position={{ lat: firstRequest.latitude, lng: firstRequest.longitude }}
+                  image={{
+                    src: "/images/marker-red.png",
+                    size: { width: 22, height: 24 },
+                  }}
+                  onClick={() => handleRequestMarkerClick(firstRequest.latitude, firstRequest.longitude)}
+                />
+              );
+            })}
+          </MarkerClusterer>
+        )}
 
         {/* 현재 위치 마커 */}
         {goormSquare && (
@@ -621,9 +606,14 @@ const KakaoMap = () => {
               btn.state ? "bg-white" : "bg-gray-300 opacity-50"
             }`}
           >
-            <img src={btn.img} alt={btn.name} className="w-6 h-6" />
+          <img
+            src={btn.img}
+            alt={btn.name}
+            className="w-6 h-6 object-contain"
+          />
           </button>
         ))}
+
 
         {/* 현재 위치 버튼 */}
         <button

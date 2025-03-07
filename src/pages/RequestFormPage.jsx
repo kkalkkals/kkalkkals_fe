@@ -75,6 +75,7 @@ const RequestFormPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    formData.money = calculatePrice(formData.trash_amount, formData.trash_type);
     setShowConfirmModal(true);
   };
 
@@ -102,6 +103,7 @@ const RequestFormPage = () => {
       navigate("/request-list");
     } catch (error) {
       console.error("Error creating request:", error);
+      alert("올바른 주소를 입력해주세요.");
     }
   };
 
@@ -203,7 +205,7 @@ const RequestFormPage = () => {
           <div className="total-price">
             <span className="price-label">총액</span>
             <span className="price-value">
-              {calculatePrice(formData.trash_amount)}원
+              {calculatePrice(formData.trash_amount, formData.trash_type)}원
             </span>
           </div>
           <button
@@ -249,20 +251,22 @@ const RequestFormPage = () => {
   );
 };
 
-const calculatePrice = (amount) => {
+const calculatePrice = (amount, type) => {
   const basePrice = 2500;
   const amountNum = parseInt(amount) || 0;
 
-  // 1L 이하일 경우 기본 요금만 적용
-  if (amountNum <= (amount === 8 ? 1 : 10)) {
+  // type이 8일 경우: 1L 이하일 때 기본 요금 적용
+  // 그 외의 경우: 10L 이하일 때 기본 요금 적용
+  const maxAmount = type === 8 ? 1 : 10;
+
+  if (amountNum <= maxAmount) {
     return basePrice;
   }
 
   // 초과분에 대한 요금 계산
-  const extraAmount = amountNum - (amount === 8 ? 1 : 10);
+  const extraAmount = amountNum - maxAmount;
   const extraPrice = extraAmount * 200;
 
-  amount = basePrice + extraPrice;
   return basePrice + extraPrice;
 };
 
